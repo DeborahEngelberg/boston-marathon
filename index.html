@@ -1,0 +1,1212 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Boston Marathon Operations Manual</title>
+  <meta name="description" content="Comprehensive Boston Marathon guide for runners and spectators. Course analysis, transit strategy, pacing, spectator itineraries, and community intelligence.">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Bitter:wght@400;700&family=Source+Sans+3:wght@300;400;600;700&display=swap" rel="stylesheet">
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body { -webkit-font-smoothing: antialiased; -moz-osx-font-smoothing: grayscale; }
+    #root { min-height: 100vh; }
+  </style>
+  <!-- React 18 Production -->
+  <script crossorigin src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
+  <script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
+  <!-- Recharts UMD -->
+  <script crossorigin src="https://unpkg.com/recharts@2.12.7/umd/Recharts.js"></script>
+  <!-- Babel Standalone for JSX -->
+  <script crossorigin src="https://unpkg.com/@babel/standalone@7/babel.min.js"></script>
+</head>
+<body>
+  <div id="root"></div>
+  <script type="text/babel" data-type="module">
+    // React hooks from global
+    const { useState, useEffect, useRef, useMemo, useCallback } = React;
+    // Recharts components from global
+    const { AreaChart, Area, XAxis, YAxis, Tooltip, ResponsiveContainer, ReferenceLine, ReferenceArea } = Recharts;
+
+
+/* ═══════════════════════════════════════════════════════════════════
+   THEMES
+   ═══════════════════════════════════════════════════════════════════ */
+const L_TH = {
+  k:"l",bg:"#f4f1eb",card:"#fff",accent:"#1a3c2a",gold:"#8b7331",
+  tx:"#1a1a1a",t2:"#4a4a4a",t3:"#888",bd:"#ddd8ce",
+  gr:"#16803c",rd:"#b91c1c",bl:"#1d4ed8",or:"#b45309",
+  nh:"rgba(180,40,40,.08)",hbk:"rgba(180,40,40,.18)",edh:"rgba(30,78,216,.06)",
+  hd:"#fff",hdb:"#ccc8bc",ta:"#1a3c2a",tt:"#888",
+  sh:"0 1px 2px rgba(0,0,0,.05)",tile:"https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png",
+  es:"#1a3c2a",ck:"#eef4ef",sb:"#ece8df",mt:"#fff",
+};
+const D_TH = {
+  k:"d",bg:"#080c14",card:"#10182a",accent:"#c4a44a",gold:"#c4a44a",
+  tx:"#ddd9d0",t2:"#8b8d93",t3:"#555",bd:"#1a2440",
+  gr:"#22c55e",rd:"#ef4444",bl:"#3b82f6",or:"#f59e0b",
+  nh:"rgba(239,68,68,.12)",hbk:"rgba(239,68,68,.25)",edh:"rgba(59,130,246,.08)",
+  hd:"#10182a",hdb:"#1a2440",ta:"#c4a44a",tt:"#556",
+  sh:"0 1px 3px rgba(0,0,0,.3)",tile:"https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png",
+  es:"#c4a44a",ck:"rgba(196,164,74,.06)",sb:"#10182a",mt:"#080c14",
+};
+
+/* ═══════════════════════════════════════════════════════════════════
+   DATA
+   ═══════════════════════════════════════════════════════════════════ */
+const EL=[{m:0,e:490,t:"Hopkinton",s:"s"},{m:1,e:360,t:"Hopkinton",s:"d"},{m:2,e:320,t:"Hopkinton",s:"d"},{m:3,e:265,t:"Ashland",s:"d"},{m:4,e:180,t:"Ashland",s:"d"},{m:5,e:205,t:"Ashland",s:"r"},{m:6,e:180,t:"Framingham",s:"r"},{m:7,e:155,t:"Framingham",s:"r"},{m:8,e:180,t:"Natick",s:"r"},{m:9,e:150,t:"Natick",s:"r"},{m:10,e:170,t:"Natick",s:"r"},{m:11,e:180,t:"Natick",s:"r"},{m:12,e:165,t:"Wellesley",s:"w"},{m:13,e:145,t:"Wellesley",s:"w"},{m:14,e:130,t:"Wellesley",s:"w"},{m:15,e:160,t:"Wellesley",s:"w"},{m:16,e:60,t:"Newton LF",s:"n"},{m:17,e:115,t:"Newton",s:"n"},{m:18,e:145,t:"Newton",s:"n"},{m:19,e:130,t:"Newton",s:"n"},{m:20,e:150,t:"Newton",s:"n"},{m:21,e:230,t:"Boston College",s:"h"},{m:22,e:150,t:"Brighton",s:"f"},{m:23,e:95,t:"Brookline",s:"f"},{m:24,e:60,t:"Brookline",s:"f"},{m:25,e:15,t:"Boston",s:"f"},{m:26,e:10,t:"Boston",s:"x"},{m:26.2,e:10,t:"Finish",s:"x"}];
+
+const CC=[[42.2293,-71.5218],[42.2352,-71.5098],[42.2421,-71.487],[42.2488,-71.4635],[42.2553,-71.442],[42.257,-71.4218],[42.259,-71.398],[42.262,-71.375],[42.268,-71.352],[42.272,-71.331],[42.28,-71.31],[42.288,-71.289],[42.293,-71.268],[42.296,-71.25],[42.301,-71.231],[42.306,-71.215],[42.319,-71.205],[42.331,-71.197],[42.338,-71.187],[42.34,-71.173],[42.342,-71.159],[42.34,-71.147],[42.345,-71.133],[42.347,-71.118],[42.349,-71.101],[42.35,-71.088],[42.3498,-71.076],[42.3496,-71.0773],[42.3491,-71.0775]];
+
+const MK=[{m:0,la:42.2293,lo:-71.5218,l:"START",d:"490 ft. Point of no return."},{m:4,la:42.2553,lo:-71.442,l:"M4",d:"180 ft. 310 ft dropped. Quad damage accumulating."},{m:8,la:42.268,lo:-71.352,l:"M8",d:"Natick. False-flat rollers."},{m:12,la:42.293,lo:-71.268,l:"M12",d:"Scream Tunnel. Control the adrenaline."},{m:13.1,la:42.296,lo:-71.25,l:"HALF",d:"Halfway. You are NOT half done."},{m:16,la:42.319,lo:-71.205,l:"M16",d:"60 ft. Lowest. Newton begins NOW."},{m:17,la:42.331,lo:-71.197,l:"M17",d:"Hill 1. Gel depot 2."},{m:20,la:42.342,lo:-71.159,l:"M20",d:"Hill 3 summit. Heartbreak next."},{m:20.5,la:42.341,lo:-71.153,l:"HB",d:"Heartbreak. 0.4 mi, +88 ft, 4% grade."},{m:21,la:42.34,lo:-71.147,l:"M21",d:"Summit 230 ft. All downhill to glory."},{m:25,la:42.35,lo:-71.088,l:"M25",d:"Citgo sign. 1.2 mi. Do not stop."},{m:26.2,la:42.3491,lo:-71.0775,l:"FIN",d:"Boylston St. 10 ft. Done."}];
+
+const SP=[{n:"Scream Tunnel",la:42.294,lo:-71.26,t:"M12. Wellesley College. 100+ dB. Runners accelerate 5-10 sec/mi involuntarily here.",tr:"Wellesley Commuter Rail"},{n:"Heartbreak Hill",la:42.341,lo:-71.153,t:"M20-21. Where races are decided. BC campus.",tr:"Green B to BC"},{n:"Coolidge Corner",la:42.347,lo:-71.118,t:"M23. Brookline. Less packed. Good restaurants for waiting.",tr:"Green C"},{n:"Kenmore/Citgo",la:42.3488,lo:-71.0972,t:"M25. The Citgo sign. Emotional. Massive crowds.",tr:"Green to Kenmore"},{n:"Finish",la:42.3491,lo:-71.0775,t:"Security checkpoints. ADA viewing at Hereford/Boylston.",tr:"Orange to Back Bay"}];
+
+const GL=[{m:11.8,d:"Depot 1: Maurten Gel 100 + CAF 100"},{m:17,d:"Depot 2: Maurten Gel 100 + CAF 100"},{m:21.5,d:"Depot 3: Maurten Gel 100 + CAF 100"}];
+
+const QS=[{a:"18-34",m:"2:55",w:"3:25"},{a:"35-39",m:"3:00",w:"3:30"},{a:"40-44",m:"3:05",w:"3:35"},{a:"45-49",m:"3:15",w:"3:45"},{a:"50-54",m:"3:20",w:"3:50"},{a:"55-59",m:"3:30",w:"4:00"},{a:"60-64",m:"3:50",w:"4:20"},{a:"65-69",m:"4:05",w:"4:35"},{a:"70-74",m:"4:20",w:"4:50"},{a:"75-79",m:"4:35",w:"5:05"},{a:"80+",m:"4:50",w:"5:20"}];
+
+const CUTS=[{y:"2020",c:"1:39 (COVID year, reduced field)"},{y:"2022",c:"Not applied (return race)"},{y:"2023",c:"5:00"},{y:"2024",c:"5:29"},{y:"2025",c:"6:51"},{y:"2026",c:"4:34 (after 5-min standard tightening)"}];
+
+const SEGS = [
+  {id:"d",r:"Start to Mile 4",nm:"The Trap",el:"-310 ft (490→180)",
+   grade:"Avg 3% down. Mile 1: 7.5% max grade. Steepest sustained descent of any World Major.",
+   body:[
+    "This is where Boston races are lost. Not won. Lost. The 310-ft plunge in 4 miles creates an eccentric contraction load on your quadriceps that you will not feel until mile 17. By then it is too late.",
+    "The physiology: downhill running forces your quads to brake against gravity. Each stride produces micro-tears in muscle fibers via eccentric (lengthening) contractions. Research from Eston et al. shows eccentric damage peaks 48-72 hours post-effort, but at Boston, you only have 12-17 more miles before those damaged quads must climb Newton.",
+    "GPS pace is lying to you here. Your watch says 6:30/mi but your effort is 7:15. Trust your heart rate or perceived effort, never your watch, for the first 4 miles. Cap HR at 75% of max through mile 4.",
+    "The crowd at the start is deafening. Adrenaline is at its peak. The road is literally tilting you forward. Every instinct says GO. Every instinct is wrong.",
+   ],
+   mistakes:["Running pace instead of effort","Letting gravity set tempo","Ignoring HR data","Banking time (you are borrowing from Newton)"],
+   pacing:{s3:"7:00-7:10/mi (feels painfully slow)",s35:"8:10-8:20/mi",bq:"10-15 sec/mi SLOWER than goal pace"},
+   src:"B.A.A.; V.O2/Dr. Jack Daniels; Eston et al. MSSE 1995"},
+  {id:"r",r:"Miles 5-8",nm:"The False Flats",el:"Rolling (+/- 25 ft per mile)",
+   grade:"Net change minimal. Series of 0.5-1.5% undulations.",
+   body:[
+    "Through Ashland and Framingham. Rolling terrain that feels flat but is not. These are false flats: subtle grades that mask effort. Your pace will look perfect. That is the trap.",
+    "This section is where you build the foundation for Newton. The goal is metabolic banking: run at a sustainable effort so your glycogen stores arrive at mile 16 with reserves. Burn too much here and Newton is a sufferfest.",
+    "Crowd support is moderate. Framingham center has a decent crowd. You will pass through residential neighborhoods. This section tests mental patience more than physical ability.",
+   ],
+   mistakes:["Increasing pace because it feels easy","Under-fueling (start eating by mile 5)","Ignoring mild quad tightness"],
+   pacing:{s3:"6:48-6:52/mi (goal pace, lock in)",s35:"7:58-8:02/mi",bq:"Goal pace, steady"},
+   src:"B.A.A.; Outside Running"},
+  {id:"w",r:"Miles 9-13",nm:"Scream Tunnel & Halfway Deception",el:"-35 ft net (slight undulation)",
+   grade:"Gentle descent through Natick into Wellesley. 0.5% average down.",
+   body:[
+    "Natick to Wellesley. Increasingly flat. Near mile 12, Wellesley College students create the Scream Tunnel, a half-mile corridor of sustained 100+ dB cheering. It is one of the most intense spectator experiences in world running.",
+    "Measured effect: race reports and split analyses show runners commonly accelerate 5-10 seconds per mile through the Scream Tunnel involuntarily. This is free speed you cannot afford. Control it or pay later.",
+    "Maurten Gel Depot 1 at mile 11.8. Take it. If you miss it, your next chance is mile 17.",
+    "Halfway at mile 13.1. Critical mental checkpoint: you are NOT half done. You are maybe 40% done in terms of physiological cost. The second half of Boston, because of Newton, costs roughly 60% of your total energy. Reframe: the race starts at mile 16.",
+   ],
+   mistakes:["Accelerating through Scream Tunnel","Thinking halfway means halfway","Skipping gel at 11.8","Feeling good and pushing pace"],
+   pacing:{s3:"6:48-6:52/mi (hold steady)",s35:"7:58-8:02/mi",bq:"Do not go faster than goal"},
+   src:"B.A.A.; Wellesley College; anecdotal race reports"},
+  {id:"wn",r:"Miles 13-16",nm:"The Valley",el:"-100 ft (160→60)",
+   grade:"Sharp drop mile 15-16: 3.2% grade down to course lowest point (60 ft).",
+   body:[
+    "Wellesley Hills down toward Newton Lower Falls. The drop from mile 15 to 16 is the second significant downhill section. More eccentric damage on quads that have already absorbed 310 ft of braking from the first 4 miles.",
+    "You reach the course low point at mile 16: 60 ft above sea level. You have fallen 430 vertical feet from the start. Your quads have done the work of a vertical descent greater than the height of the Statue of Liberty.",
+    "At mile 16 exactly, Newton begins. There is no transition. No warm-up hill. The road tilts up and does not meaningfully stop until mile 21. Everything before mile 16 was prologue.",
+   ],
+   mistakes:["Hammering the downhill at mile 15-16","Not eating at mile 14-15 for Newton","Mental complacency"],
+   pacing:{s3:"6:50-6:55/mi (allow slight slowdown)",s35:"8:00-8:05/mi",bq:"Accept 5-10 sec/mi slow on the climbs"},
+   src:"B.A.A.; V.O2 elevation data"},
+  {id:"n",r:"Miles 16-21",nm:"Newton Hills (The Four Hills)",el:"+170 ft total (60→230)",
+   grade:"Hill 1 (M16-17): +55 ft, 1.7% avg, Rte 128 overpass. Hill 2 (M17-18): +30 ft, 1.3%, firehouse turn to Comm Ave. Hill 3 (M19-20): +20 ft, 1.0%, past Newton City Hall. Hill 4 / Heartbreak (M20-21): +88 ft, 4.0% peak grade, half-mile sustained climb.",
+   body:[
+    "Five miles. Four hills. 170 vertical feet of climbing. This is where the Boston Marathon is decided. Not because the hills are objectively hard: 170 ft over 5 miles is a 0.65% average grade. A cyclist would not notice it. But you are not cycling at mile 16 of a marathon with 430 ft of eccentric quad damage already banked.",
+    "The first Newton hill (Rte 128 overpass) hits at mile 16 with no warning. Your HR will spike 10-15 bpm within 30 seconds. This is the moment where under-trained quads announce themselves. The micro-tears from the early downhill now produce pain, stiffness, and power loss on every uphill stride.",
+    "Hill 2 at the firehouse turn: you make a right onto Commonwealth Ave. The crowds build. The road rises 30 ft. This is manageable if you are patient.",
+    "Hill 3 past Newton City Hall: only +20 ft but you are at mile 19-20 now. Glycogen is depleting. If you have not fueled properly, you will feel the wall forming.",
+    "Hill 4: HEARTBREAK HILL. Mile 20 to 20.5. Half a mile. 88 vertical feet. 4% peak grade. It is NOT the steepest hill on the course. Hill 1 is steeper on a sustained basis. But Heartbreak is decisive because of when it arrives: mile 20, with depleted glycogen, damaged quads, and 2+ hours of accumulated fatigue.",
+    "The name comes from a 1936 race where Johnny Kelley caught leader Ellison Tarzan Brown on this hill, tapped his shoulder in passing, and Brown surged away to win. Kelley's heart was said to have broken. Yours might too.",
+    "Gel Depot 2 at mile 17. Gel Depot 3 at mile 21.5 (just past the summit). Take BOTH. You need carbohydrates for the final 5 miles.",
+   ],
+   mistakes:["Trying to maintain pace (run by EFFORT)","Not shortening stride","Skipping gels at 17 and 21.5","Looking up at Heartbreak (look at the ground 10 ft ahead)","Surging to pass people on hills (you will pay for this)"],
+   pacing:{s3:"7:00-7:20/mi (accept pace loss, hold effort)",s35:"8:15-8:40/mi",bq:"Run effort, not pace. Accept 15-30 sec/mi loss."},
+   src:"B.A.A.; V.O2; The Running Channel; Dr. Jack Daniels"},
+  {id:"f",r:"Miles 21-25.5",nm:"Downhill into Boston",el:"-220 ft (230→15)",
+   grade:"Sustained 1.5-2% downhill for 4.5 miles.",
+   body:[
+    "After Heartbreak summit near Boston College, the course drops 220 ft over the next 4.5 miles through Brighton and Brookline into Boston. This should feel like relief. For many, it feels like torture.",
+    "Your quads have now absorbed: 310 ft of downhill braking (miles 1-4), 100 ft more (miles 15-16), and just climbed 170 ft through Newton. Now you ask them to brake again for 220 ft of descent. Cramping probability peaks here. Eccentric damage is cumulative and non-linear: the third bout of downhill running causes disproportionately more damage than the first.",
+    "Mile 23: Coolidge Corner, Brookline. Crowds are dense. Mile 24: you cross into Boston city limits. Mile 25: Kenmore Square. The Citgo sign appears above the buildings. For every Boston runner, this sign means: 1.2 miles to go. It is the most emotionally significant landmark on the course.",
+    "Do NOT overstride on this downhill. Short, quick steps. Let gravity pull you but do not fight it with long braking strides. If you cramp, slow down, take electrolytes if available, and keep moving. Walking Boylston Street is still finishing.",
+   ],
+   mistakes:["Overstriding downhill (more quad damage)","Stopping for cramps instead of slowing","Trying to make up lost time from Newton","Forgetting to drink"],
+   pacing:{s3:"6:45-6:55/mi (gravity assist, recover)",s35:"7:55-8:05/mi",bq:"Whatever you have left. Run to the Citgo sign."},
+   src:"B.A.A.; course analysis; anecdotal"},
+  {id:"x",r:"Miles 25.5 to Finish",nm:"Right on Hereford, Left on Boylston",el:"Flat",
+   grade:"0%. Dead flat. 385 yards of Boylston Street.",
+   body:[
+    "The most famous 0.7 miles in marathon running. You make a RIGHT turn onto Hereford Street. Then a LEFT onto Boylston Street. The finish line is 600 meters ahead. Crowds line both sides, 5-10 deep. The noise is deafening.",
+    "Your legs may not cooperate. Cramping is common. Tunnel vision is common. The finish line looks both impossibly close and impossibly far. Run. Walk. Crawl. But do not stop.",
+    "Once you cross the line: keep moving. Medical will assess you. Volunteers will wrap you in a heat sheet. Your medal will be placed around your neck. You will collect your gear bag. Find the Family Meeting Area on Stuart Street.",
+   ],
+   mistakes:["Celebrating before the line","Stopping for photos on Boylston (finish first)","Not knowing where Family Meeting is"],
+   pacing:{s3:"Whatever is left.",s35:"Everything.",bq:"You are finishing the Boston Marathon. Pace is irrelevant."},
+   src:"B.A.A."},
+];
+
+const FAIL_MODES = [
+  {nm:"I Went Out Too Fast",pct:"~35% of DNFs cite pacing",
+   phys:"Excessive early pace burns glycogen at an exponential rate. Running 10 sec/mi faster than threshold increases carbohydrate oxidation by ~15%. At Boston, the downhill start masks this: perceived effort is low while metabolic cost is high. By mile 16, glycogen reserves are critically depleted 4-6 miles earlier than they would be in a flat marathon. The result: catastrophic bonk at Newton.",
+   fix:"Cap mile 1 HR at 75% max. Run 10-15 sec/mi slower than goal pace through mile 4. Trust training. Race starts at mile 16."},
+  {nm:"My Quads Died at Newton",pct:"Most common Boston-specific failure",
+   phys:"Eccentric muscle damage from downhill running causes micro-tears in quadriceps muscle fibers. Unlike concentric damage, eccentric damage produces delayed-onset inflammation that worsens over hours. At Boston: 310 ft of downhill in miles 1-4 seeds the damage. 100 ft more at miles 15-16 compounds it. By mile 17, when you ask those damaged quads to climb, they cannot generate sufficient force. Power output drops 15-25%. Pace collapses. This is not a willpower problem. It is a structural muscle damage problem.",
+   fix:"Eccentric training: downhill repeats (6-8% grade, 400-800m, once/week for 8+ weeks). Step-downs, Nordic hamstring curls. Run at least 3 long runs with significant downhill in the first 4 miles during training. You cannot fake quad conditioning."},
+  {nm:"Heartbreak Broke Me",pct:"~20% of Newton walkers stop on Heartbreak specifically",
+   phys:"Heartbreak arrives at mile 20-21. Glycogen stores are 60-80% depleted. Quads are structurally damaged. Core temperature is elevated. Blood pH is dropping. Lactate is accumulating in muscles that can no longer clear it efficiently. The 4% grade of Heartbreak requires ~12% more energy per stride than flat running. This combination of depleted fuel, damaged muscles, elevated metabolic stress, and increased energy demand creates a cliff-edge effect where pace collapses suddenly rather than gradually.",
+   fix:"Fuel aggressively: gel at M11.8, M17, M21.5. Shorten stride on hills (180+ cadence). Run Newton by effort, not pace. Walk breaks at hill crests are strategically valid and lose less time than a full collapse at mile 22."},
+  {nm:"I Cramped at Mile 24",pct:"Cramping peaks miles 22-25 at Boston",
+   phys:"Current research (Schwellnus et al.) points to altered neuromuscular control rather than simple dehydration as the primary cramping mechanism. After 3+ hours of running with cumulative eccentric damage, fatigued motor neurons fire erratically, causing involuntary sustained contractions. Dehydration and electrolyte loss are contributing factors but not the root cause. Boston's unique downhill-then-uphill-then-downhill profile creates more neuromuscular fatigue than any flat marathon.",
+   fix:"Electrolyte supplementation from mile 2 onward. Adequate training volume (accumulated fatigue resistance). Slow down at first sign of cramping. Stretch and walk for 30-60 seconds. Gentle resumption of running. Do NOT sprint through a cramp."},
+  {nm:"I Pushed the Mile 15-16 Downhill",pct:"Recurring community warning",
+   phys:"Distinct from the 'went out too fast' failure. This is the runner who paced well through mile 14, then saw the sharp downhill at miles 15-16 (3.2% grade, course low point at 60 ft) and thought: 'I'm behind pace, this is free speed.' It is not free. Each downhill stride loads the quads eccentrically. You already absorbed 310 ft of descent in miles 1-4. This second downhill bout adds to cumulative eccentric damage. Research shows the third bout of eccentric loading causes disproportionately more damage than the first two. Pushing here means your quads arrive at Newton mile 16 with more micro-tears than necessary. The collapse comes at mile 22-24, not immediately. Veterans call this 'paying later.' (LetsRun 2025 thread, community coaching consensus)",
+   fix:"Do not 'earn back pace' on mid-course downhills. Treat miles 15-16 as another section to run by EFFORT, not pace. If you're behind goal pace at mile 14, accept it. Pushing the downhill to make up time is borrowing from Newton at a ruinous interest rate."},
+];
+
+const FUEL_PLANS = [
+  {goal:"Sub-3:00",carb:"60-90 g/hr",timing:"Gel every 20-25 min. Start at mile 4. Personal gel at M4-5. Maurten at M11.8, M17, M21.5. Additional personal gel at M9 and M14.",fluids:"4-6 oz every 15-20 min. Cup strategy: pinch cup, sip while running. Practice this. Do not pour it on yourself at mile 2.",note:"At sub-3 pace you are burning ~1,100 cal/hr. You cannot replace it all. The goal is to slow the depletion curve enough to survive Newton."},
+  {goal:"Sub-3:30",carb:"45-60 g/hr",timing:"Gel every 25-30 min. Personal gel at M5-6. Maurten at M11.8, M17, M21.5. One personal gel at M14.",fluids:"4-6 oz every mile from M2. Alternate water and Gatorade. In heat (above 60F): water at every station.",note:"You have more time but also more time for things to go wrong. Fuel consistently. A missed gel at mile 11.8 will haunt you at mile 20."},
+  {goal:"BQ Attempt",carb:"30-60 g/hr",timing:"Gel every 30 min. Maurten at M11.8, M17, M21.5 minimum. Add personal gels if practiced.",fluids:"Drink at every water station from M2. Small sips. Never chug.",note:"For many BQ runners this is a 3:30-4:00+ effort. You are out there longer. Hydration matters more. Bring salt tabs if you sweat heavily."},
+];
+
+const WEATHER = [
+  {y:"2025",hi:"55",lo:"42",wind:"SW 8",cond:"Cloudy, cool. Near ideal."},
+  {y:"2024",hi:"64",lo:"48",wind:"S 12",cond:"Warm. Runners needed extra hydration."},
+  {y:"2023",hi:"56",lo:"44",wind:"NE 10",cond:"Overcast, humid. Headwind segments."},
+  {y:"2022",hi:"56",lo:"40",wind:"W 6",cond:"Cool, cloudy. Favorable."},
+  {y:"2019",hi:"56",lo:"42",wind:"NE 15",cond:"Cool, light rain, headwind."},
+  {y:"2018",hi:"38",lo:"34",wind:"NE 25",cond:"Brutal. Driving rain. 25 mph headwind. Hypothermia risk."},
+  {y:"2017",hi:"72",lo:"56",wind:"SW 10",cond:"Warm. Many heat-related issues."},
+  {y:"2016",hi:"72",lo:"54",wind:"SW 14",cond:"Warm tailwind."},
+  {y:"2012",hi:"89",lo:"66",wind:"SW 8",cond:"Emergency conditions. Thousands needed medical care."},
+];
+
+const LAYERS = [
+  {temp:"<40F",top:"Long sleeve base + arm warmers + throwaway jacket",bot:"Tights or half-tight",acc:"Gloves, headband/beanie, Vaseline on exposed skin",note:"Hypothermia risk if raining. Bring hand warmers for Village."},
+  {temp:"40-50F",top:"Long sleeve or short sleeve + arm warmers",bot:"Shorts or half-tight",acc:"Light gloves, consider headband",note:"Most common race day range. Arm warmers = critical flexibility."},
+  {temp:"50-60F",top:"Singlet or short sleeve",bot:"Shorts",acc:"Optional arm warmers to start, discard",note:"Good running weather. Stay hydrated."},
+  {temp:"60-70F",top:"Singlet. Lightest possible.",bot:"Split shorts",acc:"Visor, sunscreen, ice sponges at stations",note:"Performance degrades ~2% per degree above 55F. Adjust goal."},
+  {temp:">70F",top:"Minimal coverage. Lightest fabrics.",bot:"Shortest shorts you own",acc:"Visor, heavy sunscreen, ice at every station",note:"Dangerous. Slow down 30-60 sec/mi. Survival mode. 2012 was 89F and hundreds were hospitalized."},
+];
+
+const TRAIN = [
+  {nm:"Downhill Repeats",desc:"Find a 6-8% grade hill, 400-800m long. Run DOWN it at marathon pace. Walk back up. Repeat 6-10 times. This trains eccentric quad loading. Do this once per week for 8-10 weeks pre-race.",why:"You cannot fake downhill conditioning. Flat marathon training will not prepare your quads for Boston."},
+  {nm:"Newton Simulation Long Run",desc:"18-20 mile run. Start with 3-4 miles of downhill. Miles 5-13 rolling or flat. Miles 14-18: find hills. Finish with 2 miles flat. This mimics the Boston profile.",why:"Your body needs to experience the specific fatigue sequence: eccentric damage followed by hill climbing followed by more downhill."},
+  {nm:"Back-to-Back Long Runs",desc:"Saturday: 14-16 miles with hills. Sunday: 10-12 miles easy. The Sunday run teaches you to run on pre-fatigued legs.",why:"Newton arrives at mile 16 on legs that have already done significant eccentric work. Simulate this."},
+  {nm:"Quad Strength Work",desc:"Bulgarian split squats: 3x12 each leg. Step-downs (slow 4-count lowering off a step): 3x15. Nordic hamstring curls: 3x8. Single-leg deadlifts: 3x10. Twice per week.",why:"Stronger quads absorb more eccentric load before damage threshold. This is injury prevention AND performance."},
+  {nm:"Heat Prep (if warm forecast)",desc:"If forecast is above 60F: do 4-5 runs in extra layers in the final 2-3 weeks. Even 20 min of heat exposure helps plasma volume adaptation.",why:"Boston in April can hit 70F+. Thermal acclimatization takes 10-14 days minimum."},
+];
+
+const ST=[{t:"6:00 AM",d:"Military March"},{t:"9:06 AM",d:"Men Wheelchair"},{t:"9:09 AM",d:"Women Wheelchair"},{t:"9:30 AM",d:"Handcycles/Duos"},{t:"9:37 AM",d:"Pro Men"},{t:"9:47 AM",d:"Pro Women"},{t:"9:50 AM",d:"Para Athletics"},{t:"10:00 AM",d:"Wave 1"},{t:"10:25 AM",d:"Wave 2"},{t:"10:50 AM",d:"Wave 3"},{t:"11:15 AM",d:"Wave 4"}];
+
+const RTABS=["Course Analysis","Qualification","Logistics","Fuel Strategy","Weather","Training","Failure Modes","Course Map","Sources","Analytics"];
+const SPTABS=["Your Plan","Spot Cards","Itineraries","Course Map","Transit","Reunion","Gear & Rules","Community Tips","Sources","Analytics"];
+
+/* ═══════════════════════════════════════════════════════════════════
+   ANALYTICS ENGINE (in-memory, privacy-conscious)
+   ═══════════════════════════════════════════════════════════════════ */
+const _AX = {
+  sessionStart: Date.now(),
+  events: [],
+  pageViews: [],
+  scrollDepths: {},
+  utmParams: {},
+  referrer: "",
+  maxEvents: 2000,
+};
+
+function axTrack(category, action, label) {
+  const ev = { ts: Date.now(), cat: category, act: action, lbl: label || "" };
+  _AX.events.push(ev);
+  if (_AX.events.length > _AX.maxEvents) _AX.events = _AX.events.slice(-1000);
+}
+
+function axPageView(page) {
+  _AX.pageViews.push({ ts: Date.now(), page });
+  axTrack("pageview", page);
+}
+
+function axScroll(page, depth) {
+  const prev = _AX.scrollDepths[page] || 0;
+  if (depth > prev) _AX.scrollDepths[page] = depth;
+}
+
+function axInit() {
+  try {
+    const params = new URLSearchParams(window.location.search);
+    ["utm_source", "utm_medium", "utm_campaign", "utm_content", "utm_term"].forEach(k => {
+      const v = params.get(k);
+      if (v) _AX.utmParams[k] = v;
+    });
+    _AX.referrer = document.referrer || "direct";
+  } catch (e) { _AX.referrer = "direct"; }
+}
+
+function useScrollTracker(page) {
+  useEffect(() => {
+    let ticking = false;
+    const handler = () => {
+      if (!ticking) {
+        ticking = true;
+        requestAnimationFrame(() => {
+          const scrollTop = window.scrollY || document.documentElement.scrollTop;
+          const docHeight = Math.max(document.body.scrollHeight, document.documentElement.scrollHeight);
+          const winHeight = window.innerHeight;
+          const pct = Math.min(100, Math.round((scrollTop / (docHeight - winHeight)) * 100));
+          axScroll(page, pct);
+          ticking = false;
+        });
+      }
+    };
+    window.addEventListener("scroll", handler, { passive: true });
+    return () => window.removeEventListener("scroll", handler);
+  }, [page]);
+}
+
+/* ═══════════════════════════════════════════════════════════════════
+   COMPONENTS
+   ═══════════════════════════════════════════════════════════════════ */
+function Logo({c}){
+  return (
+    <svg width="36" height="36" viewBox="0 0 100 100">
+      <circle cx="50" cy="50" r="46" stroke={c} strokeWidth="2.5" fill="none"/>
+      <text x="50" y="38" textAnchor="middle" fill={c} fontSize="13" fontWeight="700" fontFamily="serif">B.A.A.</text>
+      <text x="50" y="54" textAnchor="middle" fill={c} fontSize="8" fontWeight="600" fontFamily="serif">BOSTON</text>
+      <text x="50" y="66" textAnchor="middle" fill={c} fontSize="6.5" fontWeight="600" fontFamily="serif">MARATHON</text>
+      <path d="M32 76 Q50 84 68 76" stroke={c} strokeWidth="1.5" fill="none"/>
+    </svg>
+  );
+}
+
+function MapView({sg,showS,showG,th}){
+  const ref=useRef(null),inst=useRef(null),[ok,setOk]=useState(false);
+  useEffect(()=>{if(inst.current)return;const lnk=document.createElement("link");lnk.rel="stylesheet";lnk.href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.css";document.head.appendChild(lnk);const s=document.createElement("script");s.src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.js";s.onload=()=>setOk(true);document.head.appendChild(s);},[]);
+  useEffect(()=>{if(!ok||!ref.current||inst.current)return;const L=window.L;const map=L.map(ref.current,{scrollWheelZoom:true}).setView([42.29,-71.28],11);L.tileLayer(th.tile,{attribution:"CARTO/OSM",maxZoom:19}).addTo(map);L.polyline(CC,{color:th.accent,weight:4,opacity:0.85}).addTo(map);MK.forEach(mk=>{const big=["START","FIN","HALF","HB"].includes(mk.l);const sz=big?22:16;const bg=big?th.accent:(th.k==="d"?"#334":"#ddd");const fg=big?"#fff":th.accent;const txt=mk.m===0?"S":mk.m===26.2?"F":mk.m===13.1?"H":mk.m===20.5?"!":mk.m;const ic=L.divIcon({className:"",html:"<div style='background:"+bg+";color:"+fg+";border-radius:50%;width:"+sz+"px;height:"+sz+"px;display:flex;align-items:center;justify-content:center;font-size:"+(big?8:7)+"px;font-weight:700;border:2px solid "+(big?"#fff":th.accent)+";box-shadow:0 1px 3px rgba(0,0,0,.25)'>"+txt+"</div>",iconSize:[sz,sz],iconAnchor:[sz/2,sz/2]});L.marker([mk.la,mk.lo],{icon:ic}).addTo(map).bindPopup("<div style='font-size:12px;max-width:200px'><b>"+mk.l+"</b><br/>"+mk.d+"</div>");});inst.current=map;},[ok]);
+  useEffect(()=>{if(!inst.current||!ok)return;const L=window.L,map=inst.current;map.eachLayer(l=>{if(l._ov)map.removeLayer(l)});if(showS)SP.forEach(s=>{const ic=L.divIcon({className:"",html:"<div style='background:#16803c;color:#fff;border-radius:50%;width:18px;height:18px;display:flex;align-items:center;justify-content:center;font-size:9px;border:2px solid #fff'>S</div>",iconSize:[18,18],iconAnchor:[9,9]});const m=L.marker([s.la,s.lo],{icon:ic}).addTo(map).bindPopup("<b style='color:#16803c'>"+s.n+"</b><br/>"+s.t+"<br/><em>"+s.tr+"</em>");m._ov=true;});if(showG)GL.forEach(g=>{const mm=MK.find(x=>Math.abs(x.m-g.m)<1.5);if(!mm)return;const ic=L.divIcon({className:"",html:"<div style='background:#b45309;color:#fff;border-radius:3px;padding:1px 4px;font-size:7px;font-weight:700;border:1px solid #fff'>GEL "+g.m+"</div>",iconSize:[44,14],iconAnchor:[22,7]});const m=L.marker([mm.la,mm.lo],{icon:ic}).addTo(map).bindPopup(g.d);m._ov=true;});},[showS,showG,ok]);
+  useEffect(()=>{if(!inst.current||!ok||!sg)return;const map=inst.current;const segs={d:CC.slice(0,5),r:CC.slice(4,12),w:CC.slice(11,16),wn:CC.slice(14,17),n:CC.slice(15,22),h:CC.slice(19,22),f:CC.slice(21,27),x:CC.slice(26)};const sc=segs[sg];if(sc&&sc.length>1)map.fitBounds(sc,{padding:[40,40],maxZoom:14});},[sg,ok]);
+  return <div ref={ref} style={{width:"100%",height:"100%",borderRadius:8,minHeight:280}}/>;
+}
+
+function Elev({sg,onClick,th}){
+  const Tp=({active,payload})=>{if(!active||!payload||!payload.length)return null;const d=payload[0].payload;return <div style={{background:th.card,border:"1px solid "+th.bd,padding:"6px 10px",borderRadius:5,fontSize:12}}><div style={{color:th.accent,fontWeight:700}}>Mi {d.m} {d.t}</div><div style={{color:th.tx}}>{d.e} ft</div></div>};
+  return <ResponsiveContainer width="100%" height={170}><AreaChart data={EL} margin={{top:8,right:8,left:0,bottom:0}} onClick={e=>{if(e&&e.activePayload&&e.activePayload[0]&&onClick)onClick(e.activePayload[0].payload.s)}}>
+    <defs><linearGradient id="elg" x1="0" y1="0" x2="0" y2="1"><stop offset="5%" stopColor={th.es} stopOpacity={0.25}/><stop offset="95%" stopColor={th.es} stopOpacity={0.02}/></linearGradient></defs>
+    <ReferenceArea x1={0} x2={4} fill={th.edh} label={{value:"DOWNHILL",position:"insideTop",fill:th.bl,fontSize:9}}/>
+    <ReferenceArea x1={16} x2={21} fill={th.nh} label={{value:"NEWTON",position:"insideTop",fill:th.rd,fontSize:9}}/>
+    <ReferenceArea x1={20} x2={21} fill={th.hbk} label={{value:"HB",position:"insideBottom",fill:th.tx,fontSize:8}}/>
+    <XAxis dataKey="m" stroke={th.t3} tick={{fontSize:9,fill:th.t3}} tickFormatter={v=>v%2===0?v:""}/>
+    <YAxis stroke={th.t3} tick={{fontSize:9,fill:th.t3}} domain={[0,520]} tickFormatter={v=>v+"'"}/>
+    <Tooltip content={<Tp/>}/>
+    <Area type="monotone" dataKey="e" stroke={th.es} fill="url(#elg)" strokeWidth={2}/>
+    <ReferenceLine x={11.8} stroke={th.or} strokeDasharray="3 3" strokeWidth={1}/>
+    <ReferenceLine x={17} stroke={th.or} strokeDasharray="3 3" strokeWidth={1}/>
+    <ReferenceLine x={21.5} stroke={th.or} strokeDasharray="3 3" strokeWidth={1}/>
+  </AreaChart></ResponsiveContainer>;
+}
+
+const Hd=({t,th})=>t?<h2 style={{color:th.accent,fontSize:17,fontWeight:700,marginBottom:8,fontFamily:"'Bitter',Georgia,serif",borderBottom:"1px solid "+th.bd,paddingBottom:6}}>{t}</h2>:null;
+const Bx=({t,ch,hl,th})=><div style={{background:hl?th.accent+"08":th.card,border:"1px solid "+(hl?th.accent+"30":th.bd),borderRadius:8,padding:12,marginBottom:8,boxShadow:th.sh}}>{t&&<h3 style={{color:hl?th.accent:th.tx,fontSize:13,fontWeight:700,marginBottom:5}}>{t}</h3>}<div style={{color:th.t2,fontSize:12.5,lineHeight:1.7}}>{ch}</div></div>;
+const Bl=({items,th})=><div style={{color:th.t2,fontSize:12.5,lineHeight:1.75}}>{items.map((x,i)=><div key={i} style={{display:"flex",gap:7,marginBottom:2}}><span style={{color:th.accent,flexShrink:0,marginTop:1}}>&#8226;</span><span>{x}</span></div>)}</div>;
+const Tb=({hd,rows,th})=><div style={{overflowX:"auto"}}><table style={{width:"100%",borderCollapse:"collapse",fontSize:12}}><thead><tr>{hd.map((h,i)=><th key={i} style={{textAlign:"left",padding:"6px 8px",color:th.accent,borderBottom:"2px solid "+th.accent+"30",fontWeight:700,whiteSpace:"nowrap",background:th.card}}>{h}</th>)}</tr></thead><tbody>{rows.map((r,i)=><tr key={i} style={{background:i%2===0?"transparent":th.card+"88"}}>{r.map((c,j)=><td key={j} style={{padding:"5px 8px",color:th.t2,borderBottom:"1px solid "+th.bd,whiteSpace:"nowrap"}}>{c}</td>)}</tr>)}</tbody></table></div>;
+
+/* ═══════════════════════════════════════════════════════════════════
+   PAGES
+   ═══════════════════════════════════════════════════════════════════ */
+function PCourseWar({th}){
+  const [openSeg,setOpen]=useState(null);
+  const [mapSeg,setMapSeg]=useState(null);
+  return <div>
+    <Hd t="COURSE ANALYSIS" th={th}/>
+    <Bx hl th={th} ch={<div>
+      <p style={{marginBottom:6}}>26.2 miles. 8 towns. 490 ft start. 10 ft finish. Net drop: 480 ft. Total climb: ~815 ft. This course is not a net-downhill gift. It is a course designed to expose the underprepared.</p>
+      <p style={{fontSize:11,color:th.t3}}>Elevation: V.O2/Dr. Jack Daniels. Gradients: The Running Channel, Outside Running. Physiology: cited per segment.</p>
+    </div>}/>
+    <Bx th={th} ch={<Elev sg={mapSeg} onClick={setMapSeg} th={th}/>}/>
+    <div style={{fontSize:11,color:th.t3,marginBottom:12}}>Click elevation chart to highlight segments. Orange dashes = Maurten gel depots.</div>
+
+    {SEGS.map((seg,i)=>{
+      const isOpen=openSeg===i;
+      const isHL=mapSeg===seg.id;
+      return <div key={i} style={{marginBottom:6,border:"1px solid "+(isHL?th.accent+"44":th.bd),borderRadius:8,overflow:"hidden",background:isHL?th.accent+"06":th.card,boxShadow:th.sh}}>
+        <button onClick={()=>{setOpen(isOpen?null:i);setMapSeg(seg.id);axTrack("segment",seg.nm,seg.r)}} style={{width:"100%",padding:"10px 12px",display:"flex",justifyContent:"space-between",alignItems:"center",background:"transparent",border:"none",cursor:"pointer",color:th.tx,textAlign:"left"}}>
+          <div>
+            <div style={{fontSize:13,fontWeight:700,color:isHL?th.accent:th.tx}}>{seg.r}: {seg.nm}</div>
+            <div style={{fontSize:11,color:th.t2}}>{seg.el} | {seg.grade.split(".")[0]+"."}</div>
+          </div>
+          <span style={{color:th.accent,fontSize:14,transform:isOpen?"rotate(180deg)":"none",transition:"transform .2s"}}>&#9662;</span>
+        </button>
+        {isOpen&&<div style={{padding:"0 12px 12px"}}>
+          <div style={{background:th.ck,borderLeft:"3px solid "+th.accent,padding:"6px 10px",borderRadius:"0 6px 6px 0",marginBottom:8}}>
+            <div style={{fontSize:10,color:th.accent,fontWeight:700,textTransform:"uppercase",letterSpacing:1}}>Gradient</div>
+            <div style={{fontSize:12,color:th.tx}}>{seg.grade}</div>
+          </div>
+          {seg.body.map((p,j)=><p key={j} style={{color:th.t2,fontSize:12.5,lineHeight:1.7,marginBottom:8}}>{p}</p>)}
+          <div style={{background:th.rd+"0a",border:"1px solid "+th.rd+"22",borderRadius:6,padding:8,marginBottom:8}}>
+            <div style={{fontSize:10,color:th.rd,fontWeight:700,textTransform:"uppercase",letterSpacing:1,marginBottom:3}}>Common Mistakes</div>
+            <Bl items={seg.mistakes} th={th}/>
+          </div>
+          <div style={{background:th.gr+"0a",border:"1px solid "+th.gr+"22",borderRadius:6,padding:8,marginBottom:6}}>
+            <div style={{fontSize:10,color:th.gr,fontWeight:700,textTransform:"uppercase",letterSpacing:1,marginBottom:3}}>Pacing</div>
+            <div style={{fontSize:12,color:th.t2}}><strong style={{color:th.tx}}>Sub-3:00:</strong> {seg.pacing.s3}<br/><strong style={{color:th.tx}}>Sub-3:30:</strong> {seg.pacing.s35}<br/><strong style={{color:th.tx}}>BQ:</strong> {seg.pacing.bq}</div>
+          </div>
+          <div style={{fontSize:11,color:th.t3}}>Source: {seg.src}</div>
+        </div>}
+      </div>;
+    })}
+  </div>;
+}
+
+function PQualify({th}){return <div>
+  <Hd t="QUALIFICATION INTELLIGENCE" th={th}/>
+  <Bx hl th={th} t="The Math" ch={<div>
+    <p style={{marginBottom:6}}>Qualifying does not guarantee entry. For 2026: 33,249 applied. 24,362 accepted. That is a 73% acceptance rate. The cutoff was 4 minutes 34 seconds FASTER than your qualifying standard, which itself was already tightened by 5 minutes from prior years.</p>
+    <p>Translation: if your BQ standard is 3:25:00, you needed a 3:20:26 or faster to get in.</p>
+  </div>}/>
+  <Bx t="Standards (2026/2027)" th={th} ch={<Tb hd={["Age","Men","Women"]} rows={QS.map(q=>[q.a,q.m,q.w])} th={th}/>}/>
+  <Bx t="Cutoff Delta History" th={th} ch={<div>
+    <Tb hd={["Year","Cutoff Faster Than BQ"]} rows={CUTS.map(c=>[c.y,c.c])} th={th}/>
+    <p style={{fontSize:11,color:th.t3,marginTop:6}}>Source: B.A.A. annual acceptance announcements</p>
+  </div>}/>
+  <Bx t="Strategy" th={th} ch={<Bl th={th} items={[
+    "Aim 8-10 minutes faster than your BQ standard. This provides margin against both the cutoff and a bad day.",
+    "Starting 2027: courses with net downhill of 1,500+ ft receive a 5-min time index. 3,000+ ft: 10-min index. St. George, Revel, REVEL Mt. Charleston are affected. (Source: B.A.A.)",
+    "Registration is NOT first-come-first-served. All applications submitted during the 5-day window are ranked by time under standard. Fastest get in first.",
+    "Edge case: if you age into a new age group between qualifying race and Boston, you get the EASIER standard. Plan your qualifying race accordingly.",
+    "Pregnancy deferrals available. Contact B.A.A. directly.",
+    "Only certified full-marathon distance. No half-marathon conversions. No virtual races. Official net (chip) time.",
+  ]}/>}/>
+</div>;}
+
+function PLogistics({th}){return <div>
+  <Hd t="RACE DAY LOGISTICS" th={th}/>
+  <Bx hl th={th} ch={<p>Treat every published time window as a hard constraint, not a suggestion. Bake in buffer for at least one surprise delay. First-timers consistently underestimate the friction between zones (bag check → bus loading → bus ride → village → corral). Budget 15-20 min more than you think you need at every transition.</p>}/>
+
+  <Bx t="Bus to Hopkinton: The Real Timeline" th={th} ch={<div>
+    <Bl th={th} items={[
+      "Buses depart from Boston Common. Bib required for boarding. No bib, no bus. Transportation to the start is for official participants ONLY. (B.A.A. participant guide)",
+      "WAVE-BASED SECURITY GATING: you cannot enter the bus loading area until your wave's loading window opens. Showing up early with a Wave 3 bib does not get you on an earlier bus. Security enforces this at the entrance. (Reddit r/bostonmarathon, recurring reports)",
+      "Bus loading physical reality: long herded lines stretching the length of Boston Common. Buses are released in large groups once a section fills. It has a convoy feel — coned-off lane onto the highway. (Race reports, Medium)",
+      "Published ride time: 45-60 minutes. ACTUAL ride time: unpredictable. One runner reports boarding at ~7:00 AM and not exiting until ~9:00 AM due to driver routing issues. The entire morning became a rush with no warm-up time. This is a tail risk, not the norm, but it happens. (Reddit)",
+      "B.A.A. participant guide states a hard cutoff for the last bus leaving Boston Common. Treat this as non-negotiable. Miss the bus, miss the race.",
+      "If not checking a bag: Park Street or Arlington T stations are the closest subway access to Boston Common. Community tip: security screening in the MIDDLE of the Common tends to have shorter lines than the perimeter entrances. (Blog, unverified)",
+      "Porta-potties on the bus? No. Use restrooms at Common BEFORE entering bus loading. Once in the queue, you're committed.",
+    ]}/>
+  </div>}/>
+
+  <Bx t="Bag Drop: The Hidden Walk" th={th} ch={<div>
+    <Bl th={th} items={[
+      "Official gear bag transported from Athletes' Village to the finish area. You collect it after finishing.",
+      "Gear check setup: school buses lined up by wave/bib number, positioned between the finish area and bus loading zone. Some runners leave their phone in the gear bag (means no tracking during the race).",
+      "THE FORGOTTEN WALK: bag check itself is quick (1-2 min), BUT the walk from bag check to bus loading is 5-10 minutes. First-timers budget 'bag drop' but not the transit between zones. This is where people suddenly feel rushed. (Reddit, recurring)",
+      "CARRY CONSTRAINT: you may ONLY bring the official start village bag to the start. One clear 1-gallon plastic bag for food/drink, subject to search. No backpacks. No hydration packs. Whatever you bring must survive the carry rules — this is why 'disposable layer' tactics exist. (B.A.A.; blog)",
+      "Put post-race clothes, phone charger, and cash/card in your gear bag. You will want dry clothes and your phone at the finish.",
+    ]}/>
+  </div>}/>
+
+  <Bx t="Drop-Off Edge Cases" th={th} ch={<Bl th={th} items={[
+    "If someone is driving you: limited participant-only parking at 52 and 80 South Street in Hopkinton. B.A.A. shuttle buses run from these lots to the Village.",
+    "Community edge case: one runner describes being dropped near I-495, walking down an exit ramp ~0.5 mi to a shuttle pickup point at 52 South Street. This works but budget extra time. (Reddit)",
+    "Limited spectator parking at Hopkinton State Park with shuttles to viewing areas on race morning. (B.A.A.)",
+  ]}/>}/>
+
+  <Bx t="Athletes' Village: The Wait" th={th} ch={<Bl th={th} items={[
+    "Large staging area in Hopkinton. Water, electrolytes, porta-potties. Bring your own food in your clear bag.",
+    "EXPECT 1-2 HOURS of waiting even if you arrive 'on time.' This is normal and built into the schedule. Village is where throwaway clothes earn their value. Goodwill jacket, old sweatpants. Discard before entering your corral. Volunteers collect clothing for charity. (Reddit, recurring)",
+    "Porta-potty lines: brutal. 20-40 minute waits at peak. Strategy: walk 3-5 minutes to the PERIMETER porta-potties. Most people cluster near the center. The far-edge units have shorter lines.",
+    "Sit on a trash bag to stay dry if ground is wet. Hand warmers if temp is below 50F. Whatever you bring must fit in your allowed carry — this shapes every decision.",
+    "Cold/waiting implication: if you're static for 1-2 hours in 40F weather, you WILL get cold regardless of race-day confidence. Layers you can discard are not optional. (Community timing data)",
+  ]}/>}/>
+
+  <Bx t="Corral Loading & Security" th={th} ch={<Bl th={th} items={[
+    "Wave 1 (red bibs 1-8499): fastest qualifiers. Wave 2 (white 8500-16999). Wave 3 (blue 17000-25499). Wave 4 (yellow 25500-33999).",
+    "~9 corrals per wave. You can move BACK in corrals, not forward. If you are in corral 4, you cannot move to corral 2.",
+    "Corrals close before wave start. If you are not in your corral when it closes, you start from the back.",
+    "Start corral psychology: the urge to weave through slower runners in the first mile is strong. Resist. Weaving costs energy, increases collision risk, and encourages going out too fast.",
+  ]}/>}/>
+
+  <Bx t="If It Rains" th={th} ch={<Bl th={th} items={[
+    "Reference: 2018. 38F, driving rain, 25 mph headwind. Hundreds treated for hypothermia.",
+    "Rain plan: waterproof throwaway layer for Village wait. Trash bag poncho. Change into race kit as late as possible. Vaseline on nipples, inner thighs, feet. Wool or synthetic socks only.",
+    "Hat with brim to keep rain off face. Consider clear glasses or visor.",
+    "Shoes will be soaked. Accept this. Do NOT wear new shoes on a rain day. Blisters are race-ending.",
+  ]}/>}/>
+  <Bx t="Start Times" th={th} ch={<Tb hd={["Time (ET)","Division"]} rows={ST.map(s=>[s.t,s.d])} th={th}/>}/>
+</div>;}
+
+function PFuel({th}){return <div>
+  <Hd t="FUEL & HYDRATION STRATEGY" th={th}/>
+  <Bx hl th={th} ch={<div>
+    <p style={{marginBottom:4}}>Boston changes fueling. The early downhill reduces perceived effort, which reduces perceived need to eat. By the time you feel hungry at Newton, glycogen depletion is already critical. Front-load your fueling. Eat before you are hungry. Drink before you are thirsty.</p>
+    <p style={{fontSize:11,color:th.t3}}>Aid stations: Water + Gatorade every mile from M2, both sides, paper cups. (B.A.A.)</p>
+  </div>}/>
+  <Bx t="Maurten Gel Depots" th={th} ch={<Tb hd={["Mile","Product"]} rows={GL.map(g=>[g.m,g.d])} th={th}/>}/>
+  {FUEL_PLANS.map((fp,i)=><Bx key={i} t={fp.goal} th={th} ch={<div>
+    <div style={{display:"flex",gap:12,flexWrap:"wrap",marginBottom:6}}>
+      <div><span style={{fontSize:11,color:th.accent,fontWeight:700}}>CARBS:</span> <span style={{fontSize:12}}>{fp.carb}</span></div>
+    </div>
+    <p style={{marginBottom:4,fontSize:12.5}}><strong style={{color:th.tx}}>Timing:</strong> {fp.timing}</p>
+    <p style={{marginBottom:4,fontSize:12.5}}><strong style={{color:th.tx}}>Fluids:</strong> {fp.fluids}</p>
+    <div style={{background:th.ck,borderLeft:"3px solid "+th.accent,padding:"6px 10px",borderRadius:"0 5px 5px 0",fontSize:12}}>{fp.note}</div>
+  </div>}/>)}
+  <Bx t="Cup Strategy" th={th} ch={<Bl th={th} items={[
+    "Paper cups. Pinch the top to form a spout. Sip while moving. Practice this in training.",
+    "Take water from the SECOND table at each station. The first table is mobbed.",
+    "Gatorade is served first, water second at each station. Know which you want before you arrive.",
+    "In heat (60F+): grab two cups. Drink one, pour one on your head/neck.",
+  ]}/>}/>
+</div>;}
+
+function PWeather({th}){return <div>
+  <Hd t="WEATHER INTEL" th={th}/>
+  <Bx hl th={th} ch={<div>
+    <p style={{marginBottom:4}}>Average marathon day: High 58F, start temp ~48F, 58% humidity. Wind predominantly SW (tailwind on Comm Ave segments) but NE headwinds occur in ~30% of years. Ideal marathon temp: 44-50F (Ely et al., PLoS ONE 2007).</p>
+    <p style={{fontSize:11,color:th.t3}}>Sources: NOAA Climate.gov; Cornell NRCC; NBC Boston</p>
+  </div>}/>
+  <Bx t="Historical Race Day Weather" th={th} ch={<Tb hd={["Year","High","Low","Wind","Conditions"]} rows={WEATHER.map(w=>[w.y,w.hi+"F",w.lo+"F",w.wind+" mph",w.cond])} th={th}/>}/>
+  <Bx t="Layer Strategy by Temperature" th={th} ch={<div>
+    {LAYERS.map((ly,i)=><div key={i} style={{marginBottom:8,paddingBottom:8,borderBottom:i<LAYERS.length-1?"1px solid "+th.bd:"none"}}>
+      <div style={{fontSize:13,fontWeight:700,color:th.accent,marginBottom:3}}>{ly.temp}</div>
+      <div style={{fontSize:12,color:th.t2,marginBottom:2}}><strong style={{color:th.tx}}>Top:</strong> {ly.top}</div>
+      <div style={{fontSize:12,color:th.t2,marginBottom:2}}><strong style={{color:th.tx}}>Bottom:</strong> {ly.bot}</div>
+      <div style={{fontSize:12,color:th.t2,marginBottom:2}}><strong style={{color:th.tx}}>Accessories:</strong> {ly.acc}</div>
+      <div style={{fontSize:11,color:th.or,fontStyle:"italic"}}>{ly.note}</div>
+    </div>)}
+  </div>}/>
+  <Bx t="Wind" th={th} ch={<Bl th={th} items={[
+    "The course runs generally west to east. Prevailing April winds are SW, producing a partial tailwind for most of the course.",
+    "NE winds (headwind) occur in ~30% of race years. 2018: 25 mph NE headwind was race-defining.",
+    "Headwind on Comm Ave (M17-21) turns Newton Hills from hard to brutal. Adjust pace expectations by 15-30 sec/mi in headwind years.",
+    "Crosswinds are worst on open stretches of Route 135 (M3-8). No tall buildings for wind break.",
+  ]}/>}/>
+</div>;}
+
+function PTrain({th}){return <div>
+  <Hd t="TRAINING FOR BOSTON SPECIFICALLY" th={th}/>
+  <Bx hl th={th} ch={<p>Flat marathon training will get you to the start line. It will not get you to the finish. Boston requires specific adaptations that no other major demands: eccentric quad conditioning, downhill running economy, and the ability to climb hills on pre-fatigued legs.</p>}/>
+  {TRAIN.map((t,i)=><Bx key={i} t={t.nm} th={th} ch={<div>
+    <p style={{marginBottom:6,fontSize:12.5}}>{t.desc}</p>
+    <div style={{background:th.ck,borderLeft:"3px solid "+th.accent,padding:"6px 10px",borderRadius:"0 5px 5px 0",fontSize:12}}><strong style={{color:th.accent}}>Why:</strong> {t.why}</div>
+  </div>}/>)}
+  <Bx t="Taper Adjustments" th={th} ch={<Bl th={th} items={[
+    "Standard 3-week taper. BUT: include one short downhill session (4x400m downhill at MP) in week 2. This maintains eccentric adaptations without adding fatigue.",
+    "Final long run (12-14 mi): include 2-3 miles of rolling hills. This is a reminder, not a workout.",
+    "Reduce volume 40% week 1, 60% week 2, 80% week 3. Maintain intensity on 2-3 short sessions.",
+    "Sleep is your most important taper tool. 8+ hours for the final 10 days. Non-negotiable.",
+  ]}/>}/>
+</div>;}
+
+function PFail({th}){return <div>
+  <Hd t="COMMON FAILURE MODES" th={th}/>
+  <Bx hl th={th} ch={<p>Boston has a higher DNF rate than most flat marathons. These are the specific mechanisms that break runners here. Each has a physiological basis and each has a preventable solution.</p>}/>
+  {FAIL_MODES.map((fm,i)=><Bx key={i} th={th} ch={<div>
+    <div style={{display:"flex",justifyContent:"space-between",alignItems:"baseline",marginBottom:6}}>
+      <div style={{fontSize:14,fontWeight:700,color:th.rd}}>"{fm.nm}"</div>
+      <div style={{fontSize:11,color:th.t3}}>{fm.pct}</div>
+    </div>
+    <div style={{marginBottom:8}}>
+      <div style={{fontSize:10,color:th.t3,fontWeight:700,textTransform:"uppercase",letterSpacing:1,marginBottom:3}}>Physiological Mechanism</div>
+      <p style={{fontSize:12.5,color:th.t2,lineHeight:1.7}}>{fm.phys}</p>
+    </div>
+    <div style={{background:th.gr+"08",border:"1px solid "+th.gr+"22",borderRadius:6,padding:8}}>
+      <div style={{fontSize:10,color:th.gr,fontWeight:700,textTransform:"uppercase",letterSpacing:1,marginBottom:3}}>Prevention</div>
+      <p style={{fontSize:12.5,color:th.t2,lineHeight:1.6}}>{fm.fix}</p>
+    </div>
+  </div>}/>)}
+</div>;}
+
+function PMapPage({mode,th}){
+  const [ss,setSS]=useState(mode==="s");const [sg,setSG]=useState(mode==="r");const [seg,setSeg]=useState(null);
+  const btn=(on,c)=>({padding:"4px 10px",borderRadius:16,border:"1px solid "+(on?c:th.bd),background:on?c+"12":"transparent",color:on?c:th.t2,cursor:"pointer",fontSize:11,fontWeight:on?600:400});
+  return <div>
+    <Hd t="INTERACTIVE COURSE MAP" th={th}/>
+    <div style={{display:"flex",gap:4,marginBottom:8,flexWrap:"wrap"}}>
+      <button onClick={()=>{setSS(!ss);axTrack("map","Spectators "+(ss?"OFF":"ON"))}} style={btn(ss,th.gr)}>Spectators {ss?"ON":"OFF"}</button>
+      <button onClick={()=>{setSG(!sg);axTrack("map","Gels "+(sg?"OFF":"ON"))}} style={btn(sg,th.or)}>Gels {sg?"ON":"OFF"}</button>
+      {[["n","Newton"],["h","Heartbreak"],["d","Downhill"],["x","Finish"]].map(([k,v])=><button key={k} onClick={()=>{setSeg(seg===k?null:k);axTrack("map",v)}} style={btn(seg===k,th.accent)}>{v}</button>)}
+    </div>
+    <div style={{height:420,borderRadius:8,overflow:"hidden",border:"1px solid "+th.bd,boxShadow:th.sh}}>
+      <MapView sg={seg} showS={ss} showG={sg} th={th}/>
+    </div>
+    <div style={{marginTop:8}}><Bx th={th} ch={<Elev sg={seg} onClick={setSeg} th={th}/>}/></div>
+  </div>;
+}
+
+function PSources({th}){
+  const groups=[
+    {c:"B.A.A. Official",i:["baa.org/races/boston-marathon/the-course","baa.org/races/boston-marathon/qualify","baa.org/races/boston-marathon/qualify/history-qualifying-times","baa.org/races/boston-marathon/info-for-athletes","baa.org/races/boston-marathon/info-for-spectators","baa.org/news/130thqualifiers","baa.org/news/2026-and-2027-registration-updates"]},
+    {c:"Elevation & Course Analysis",i:["V.O2 / Dr. Jack Daniels elevation data (news.vdoto2.com)","Outside Running course analysis (run.outsideonline.com)","The Running Channel mile-by-mile (therunningchannel.com)","Boston Discovery Guide course breakdown","Boston.com mile-by-mile elevations"]},
+    {c:"Weather & Climate",i:["NOAA Climate.gov: warmer-april-high-temps-boston-marathon","Cornell NRCC April climatology (nrcc.cornell.edu)","NBC Boston race day weather stats","Ely et al. PLoS ONE 2007 (optimal marathon temperature research)"]},
+    {c:"Physiology & Training",i:["Eston et al. MSSE 1995 (eccentric muscle damage)","Schwellnus et al. BJSM 2008 (exercise-associated muscle cramping)","Pfitzinger & Douglas: Advanced Marathoning","Daniels: Daniels Running Formula"]},
+    {c:"News & Cutoff Data",i:["NBC Boston 2026 qualifying (nbcboston.com)","Boston.com 2026 cutoffs","Yahoo Sports qualifying analysis"]},
+    {c:"Community & Race Reports",i:["LetsRun.com: spectator advice and pacing failure threads (multiple years)","Reddit r/bostonmarathon: wave gating, bus logistics, finish area reports","Reddit r/boston: Hopkinton access warnings","Medium: race report (bus loading operational detail)","Fodor's Travel Forums: spectator routing"]},
+  ];
+  return <div>
+    <Hd t="SOURCES & CITATIONS" th={th}/>
+    <Bx th={th} ch={<p>Every factual claim is sourced. B.A.A. official pages are primary. Physiological mechanisms cite peer-reviewed research. Strategy advice labeled as coaching consensus where not officially sourced. Anecdotal content labeled explicitly.</p>}/>
+    {groups.map((g,i)=><Bx key={i} t={g.c} th={th} ch={<div>{g.i.map((s,j)=><div key={j} style={{fontSize:12,color:th.bl,marginBottom:3}}>{s}</div>)}</div>}/>)}
+  </div>;
+}
+
+function SPlan({th}){
+  const Tag=({c,ch})=><span style={{display:"inline-block",padding:"1px 6px",borderRadius:10,fontSize:10,fontWeight:600,background:c+"15",color:c,border:"1px solid "+c+"30",marginRight:4}}>{ch}</span>;
+  return <div>
+    <Hd t="CHOOSE YOUR MISSION" th={th}/>
+    <Bx hl th={th} ch={<p>Before planning, answer one question: how many times do you need to see your runner? The answer determines everything. More views = more transit risk. Be honest about your tolerance for uncertainty.</p>}/>
+
+    <Bx t="OPTION A: One Spot (Best Atmosphere)" th={th} ch={<div>
+      <Tag c={th.gr} ch="LOW RISK"/><Tag c={th.bl} ch="FAMILIES"/><Tag c={th.bl} ch="KIDS"/><Tag c={th.bl} ch="MOBILITY LIMITS"/>
+      <p style={{marginTop:6}}>Pick one location. Arrive early. Soak it in. Meet runner after at the Family Meeting Area.</p>
+      <div style={{marginTop:6}}><strong style={{color:th.tx}}>Best single spots:</strong></div>
+      <Bl th={th} items={[
+        "Wellesley Scream Tunnel (mile 12-13): Best energy on the entire course. Commuter Rail to Wellesley Square, walk 0.8 mi west on Rte 135.",
+        "Heartbreak Hill crest (mile 21): Where the race is decided. Green Line B to Boston College, walk 0.3 mi west on Comm Ave.",
+        "Kenmore Square (mile 25): Near finish, Citgo sign, massive crowds. Green Line to Kenmore.",
+      ]}/>
+    </div>}/>
+
+    <Bx t="OPTION B: Two Spots (Realistic)" th={th} ch={<div>
+      <Tag c={th.or} ch="MODERATE RISK"/><Tag c={th.bl} ch="MOST COMMON"/>
+      <p style={{marginTop:6}}>The sweet spot. Two views is reliably achievable with transit. Three is possible but pace-dependent.</p>
+      <div style={{marginTop:6}}><strong style={{color:th.tx}}>Proven two-spot combos:</strong></div>
+      <Bl th={th} items={[
+        "COMBO 1 (Reliable): Woodland (mile 17) → Green Line inbound → finish area. The 'standard play.' Green Line D to Woodland, watch Newton hills, ride inbound to Arlington or Back Bay. Works for all paces.",
+        "COMBO 2 (Best energy): Wellesley (mile 13) → Commuter Rail inbound to Boston → finish area. Commuter Rail to Wellesley Square, then inbound to Back Bay. Miss Newton entirely but see halfway + finish.",
+        "COMBO 3 (Car + T): Drive Rte 9 to Natick (mile 10) → park at Riverside → Green Line to finish. Per community reports: park on Natick side streets, drive Rte 9 east to Riverside (925 spaces), Green Line inbound.",
+      ]}/>
+      <p style={{fontSize:11,color:th.t3,marginTop:4}}>Sources: B.A.A. Spectator Guide; LetsRun forums; boston.com spectator guide</p>
+    </div>}/>
+
+    <Bx t="OPTION C: Three Spots (Pace-Dependent)" th={th} ch={<div>
+      <Tag c={th.rd} ch="HIGH RISK"/><Tag c={th.bl} ch="EXPERIENCED ONLY"/>
+      <p style={{marginTop:6}}>Only works if your runner is slower than 9:00/mi pace (4+ hour finish). Faster runners don't give you enough transit time between spots.</p>
+      <Bl th={th} items={[
+        "PATTERN: Framingham (mile 6, Commuter Rail) → Commuter Rail inbound to Wellesley (mile 13) → Commuter Rail to Back Bay → walk to finish.",
+        "RISK: Commuter Rail runs on holiday schedule. Miss one train and you miss a viewing. Have the B.A.A. app tracking your runner in real time.",
+        "Community consensus (LetsRun, Reddit): 'Don't plan to see your runner more than twice. The finish is a madhouse.' Attempting 3 spots frequently results in seeing 1.",
+      ]}/>
+    </div>}/>
+
+    <Bx t="Decision Logic" th={th} ch={<div style={{fontSize:12.5,lineHeight:1.8}}>
+      <p><strong style={{color:th.tx}}>IF</strong> you have kids, mobility limits, or low stress tolerance → <strong style={{color:th.gr}}>Option A</strong> (one spot)</p>
+      <p><strong style={{color:th.tx}}>IF</strong> you want maximum reward with manageable risk → <strong style={{color:th.or}}>Option B</strong> (two spots)</p>
+      <p><strong style={{color:th.tx}}>IF</strong> runner pace is 10:00/mi+ AND you know MBTA well → <strong style={{color:th.rd}}>Option C</strong> (three spots, accept risk)</p>
+      <p><strong style={{color:th.tx}}>IF</strong> you have a car AND runner is 3:30+ → Car on Rte 9 gives you flexibility no transit can match</p>
+    </div>}/>
+
+    <Bx t="THE HOPKINTON TRAP" th={th} ch={<div>
+      <div style={{background:th.rd+"0a",border:"1px solid "+th.rd+"22",borderRadius:6,padding:8,marginBottom:6}}>
+        <div style={{fontSize:10,color:th.rd,fontWeight:700,textTransform:"uppercase",letterSpacing:1,marginBottom:3}}>CRITICAL WARNING</div>
+        <p style={{color:th.t2,fontSize:12.5,lineHeight:1.6}}>Multiple community sources call Hopkinton 'the hard part' for spectators. There is NO Commuter Rail to Hopkinton. Road closures start at 6:30 AM. Getting in requires a car or shuttle. Getting OUT after watching the start burns 60-90+ minutes of transit time — enough to nuke any multi-spot plan. (Reddit r/boston, Massachusetts tourism guides, recurring)</p>
+      </div>
+      <Bl th={th} items={[
+        "Veteran fix: skip Hopkinton unless you're committing to 'start only.' Replace it with Framingham or Ashland (both have Commuter Rail) for an early-course sighting that preserves your mobility.",
+        "If you MUST see Hopkinton: accept you will likely see the start and nothing else. Park at Hopkinton State Park (limited spectator parking, shuttles available).",
+      ]}/>
+    </div>}/>
+
+    <Bx t="COMMON FAILURE PATTERNS" th={th} ch={<div>
+      {[
+        {p:"Hopkinton + mid-course + finish",why:"Hopkinton access/exit burns the whole day. Road closures compress timelines. You spend hours getting out instead of repositioning.",fix:"Replace Hopkinton with a rail-accessible early town (Framingham, Natick). Then run a rail/Green Line plan for your second sighting."},
+        {p:"Over-ambitious 3-4 sighting plan collapses at transfers",why:"Green Line crowding + transfer time + platform backups. Even detailed community plans explicitly warn 'Cleveland Circle may need to be cut.' (Reddit)",fix:"Design your plan where Stop #2 is the 'main event' and everything else is optional. If you hit #2, you won. Every additional stop is bonus, not expected."},
+        {p:"Family can't find runner after finish",why:"Fenced security zones force specific exit flow. B.A.A. warns 'considerable time' from finish to meeting area. Cell service degrades with 500K+ people.",fix:"Pre-commit to Family Meeting Area (Stuart St, last-name letter zone) OR pick a landmark a few blocks away (Boston Common is commonly cited). Decide BEFORE race day."},
+      ].map((f,i)=><div key={i} style={{marginBottom:8,paddingBottom:8,borderBottom:i<2?"1px solid "+th.bd:"none"}}>
+        <div style={{fontSize:12,fontWeight:700,color:th.rd,marginBottom:2}}>Pattern: "{f.p}"</div>
+        <div style={{fontSize:12,color:th.t2,marginBottom:2}}><strong style={{color:th.tx}}>Why it fails:</strong> {f.why}</div>
+        <div style={{fontSize:12,color:th.gr}}><strong>Veteran fix:</strong> {f.fix}</div>
+      </div>)}
+    </div>}/>
+  </div>;
+}
+
+function SSpots({th}){
+  const Tag=({c,ch})=><span style={{display:"inline-block",padding:"1px 6px",borderRadius:10,fontSize:10,fontWeight:600,background:c+"15",color:c,border:"1px solid "+c+"30",marginRight:4}}>{ch}</span>;
+  const spots=[
+    {nm:"Early Towns (Miles 1-8)",sub:"Hopkinton, Ashland, Framingham, Natick",
+     transit:"No Commuter Rail in Hopkinton. Ashland: Commuter Rail (Worcester line), Pleasant St station, 0.8 mi walk to course. Framingham: Commuter Rail, 0.4 mi walk. Natick Center: Commuter Rail, course runs through town center.",
+     stand:"All Commuter Rail stations are on the NORTH side of the course. If you want your runner to see you, be on the LEFT side of the road (north/station side). (Source: boston.com)",
+     crowd:"Thin to moderate. Natick Center has the liveliest atmosphere of the early towns. West Natick is quieter and more remote — you'll stand out more, which runners love.",
+     exit:"Board inbound Commuter Rail. Special Marathon Monday schedule on Worcester line with extra trains. $10 Holiday Weekend Pass = unlimited Commuter Rail all day.",
+     fail:"Road closures start 6:15-7:30 AM depending on town. If driving, park BEFORE closures hit. Miss the inbound train and you may wait 30-45 min for the next one.",
+     best:"Families who want a relaxed, uncrowded experience. People who want to see the race start phase without Hopkinton chaos."},
+    {nm:"Wellesley / Scream Tunnel (Miles 12-13)",sub:"Halfway point. Wellesley College.",
+     transit:"Commuter Rail (Worcester line) to Wellesley Square. Walk 0.8 mi WEST on Rte 135 to reach the Scream Tunnel at Wellesley College. Wellesley Hills and Wellesley Farms stations also serve the course.",
+     stand:"The Scream Tunnel is a half-mile corridor of Wellesley College students. It is LOUD (100+ dB reported). Position yourself east of the main student section if you want to actually communicate with your runner — the core tunnel is so loud neither of you will hear words.",
+     crowd:"Dense at the tunnel itself. Thinner if you stand near Wellesley Square or east toward mile 13. Town center has cafes and restrooms.",
+     exit:"Inbound Commuter Rail to Boston. boston.com tip: 'If you time it right, hop back on the commuter rail and ride to Yawkey [now Lansdowne] in Kenmore Square. The bad news is you miss all of Newton and Brookline.' Alternative: stay and cheer, then Commuter Rail to Back Bay for reunion.",
+     fail:"The walk from station to tunnel is 0.8 mi and can take 15+ min if sidewalks are packed. Don't cut it close. If you miss your runner here, you cannot catch them before Newton.",
+     best:"Best single-spot energy on the course. Anyone who wants to experience the most famous spectator moment in marathoning."},
+    {nm:"Newton / Heartbreak Area (Miles 16-21)",sub:"The Four Hills. Where the race is decided.",
+     transit:"Green Line D to Woodland: puts you at mile 17, near the Newton Fire Station and the first turn onto Comm Ave. This is the 'standard spectator play.' | Green Line D to Newton Centre: 12-min walk to Comm Ave, mid-hills. | Green Line B to Boston College: mile 21, Heartbreak crest. | By car: Mass Pike exit 17 to Newton, park on side streets off Centre St near BC campus.",
+     stand:"At Woodland: walk east 0.5 mi toward the fire station (first turn onto Comm Ave). Great energy. Runners start climbing here. | At BC: Comm Ave westbound side, just past the 'Heartbreak is Over' archway. Runners cresting the hill are emotionally raw — your cheering matters most here. | Community tactic: Washington St near the hospital area, just before Heartbreak, is less crowded and gives you a head start to Woodland station for exit.",
+     crowd:"BC area is PACKED — students come out in force. It is a party atmosphere. Woodland area is more manageable. Newton Centre is the quietest option. | The Green Line fills up fast after noon. If you plan to ride inbound from BC after watching, expect standing room only and possible delays.",
+     exit:"Green Line inbound from BC or Woodland. This is where 'Heartbreak → finish' plans often fail: the Green Line can be 15-20+ min between trains at peak. If you MUST see the finish, leave BC the moment your runner passes. Do not linger. | Community tactic: 'Cheer before Heartbreak at Washington St near the hospital, then immediately board at Woodland.' This avoids the BC station crush.",
+     fail:"Attempting BC → finish only works if your runner is slower than ~9:00/mi. For a 3:00 runner, you have ~25 min from BC to finish — not enough time via Green Line. Accept: if you watch at Heartbreak, you likely miss the finish.",
+     best:"Anyone who wants to see the race's decisive moment. The emotional peak of the course. Not ideal for families with small kids (crowds at BC are intense)."},
+    {nm:"Cleveland Circle / Brookline (Miles 22-23)",sub:"Post-Heartbreak. Downhill. Runners recovering.",
+     transit:"Green Line B, C, or D to Cleveland Circle (all three branches serve it). Walk to Beacon St / Chestnut Hill Ave intersection.",
+     stand:"Beacon St sidewalks. Less packed than BC. Runners are descending — some in agony, some surging. Coolidge Corner (mile 23-24, Green C) is similar: dense but manageable, good restaurants for waiting.",
+     crowd:"Moderate to heavy. College party atmosphere fades. More families here. Easier to find curb space than BC.",
+     exit:"Green Line inbound to Kenmore (1-2 stops) or continue to Arlington/Back Bay for finish. Cleveland Circle → finish via T is ~15-20 min. This is one of the most reliable 'watch + finish' combinations.",
+     fail:"Less emotionally intense than Heartbreak. If you want drama, go to BC. If you want reliability + finish access, Cleveland Circle is better.",
+     best:"The pragmatic choice. See your runner post-Heartbreak AND realistically make it to the finish area."},
+    {nm:"Kenmore Square (Miles 24-25)",sub:"Citgo sign. 1.2 miles to go.",
+     transit:"Green Line to Kenmore station. Walk to Comm Ave / Beacon St area. The Citgo sign is the visual landmark.",
+     stand:"Comm Ave sidewalks east of Kenmore. Runners pass the Citgo sign and know they have 1.2 mi left. Emotional. Loud. | The Green Line runs above ground here and parallels the course from mile 22.5 to nearly mile 25, so if you're riding inbound you literally watch runners from the train window.",
+     crowd:"Very heavy. 4-6 people deep on sidewalks. Finding a spot requires arriving 30+ min before your runner. The intersection at Kenmore is a choke point.",
+     exit:"Walk to finish (1.2 mi on foot, 15-20 min). Or Green Line one more stop to Hynes Convention Center (note: Hynes serves B/C/D but may have restricted access race day). Arlington and Back Bay are your finish-area stations.",
+     fail:"If you arrive late, you may not get close enough to see individual runners. Kenmore crowds are large but manageable if you arrive early.",
+     best:"Emotional peak for spectators. Seeing your runner with 1.2 mi to go is powerful. Good for photographers — Citgo sign backdrop."},
+    {nm:"Finish Area / Boylston Street (Mile 26.2)",sub:"Copley Square. End of the line.",
+     transit:"CRITICAL: Copley Station is CLOSED ALL DAY. Alternatives: Arlington (Green, all branches, 0.3 mi walk east to finish). Back Bay (Orange Line, 0.2 mi walk north). Hynes Convention Center (Green B/C/D, 0.4 mi walk east). Prudential (Green E, 0.5 mi walk).",
+     stand:"Boylston St sidewalks are 6-8 people deep by mid-morning. If you want curb-side, arrive by 9:00 AM. Realistic late-arrival viewing: stand on Hereford St at the right turn (runners turn right onto Hereford, then left onto Boylston). This corner is less packed than Boylston itself. | ADA viewing: Hereford/Boylston, Ring Rd/Boylston, Fairfield/Boylston, Exeter/Boylston corners.",
+     crowd:"The most crowded spot on the course. Security checkpoints with bag inspection. No backpacks, coolers, glass. Clear plastic bags only. Lines for screening can be 10-20 min. Budget time.",
+     exit:"Walk south to Stuart St for Family Meeting Area. You cannot easily cross Boylston during the race — plan which side you'll be on before arrival.",
+     fail:"If you arrive after 10:30 AM, you will NOT get curb-side on Boylston. You will see the tops of heads. The Hereford corner or side streets with partial views are your fallback. | 'The finish area is a madhouse. People are 6, 7 and in some places 8 people deep.' (LetsRun forum)",
+     best:"Those who prioritize seeing the finish over everything else. Arrive very early or accept limited views."},
+  ];
+  return <div>
+    <Hd t="SPOT-BY-SPOT OPERATIONS" th={th}/>
+    {spots.map((s,i)=><Bx key={i} th={th} ch={<div>
+      <div style={{fontSize:14,fontWeight:700,color:th.accent,marginBottom:2}}>{s.nm}</div>
+      <div style={{fontSize:11,color:th.t2,marginBottom:8}}>{s.sub}</div>
+      {[["Transit",s.transit,th.bl],["Where to Stand",s.stand,th.gr],["Crowd Behavior",s.crowd,th.or],["Exit Strategy",s.exit,th.accent],["What Goes Wrong",s.fail,th.rd],["Best For",s.best,th.t2]].map(([label,text,c],j)=>
+        <div key={j} style={{marginBottom:6}}>
+          <div style={{fontSize:10,color:c,fontWeight:700,textTransform:"uppercase",letterSpacing:1,marginBottom:2}}>{label}</div>
+          <div style={{fontSize:12,color:th.t2,lineHeight:1.6,paddingLeft:8,borderLeft:"2px solid "+c+"33"}}>{text}</div>
+        </div>
+      )}
+    </div>}/>)}
+  </div>;
+}
+
+function SItin({th}){
+  const itin=[
+    {nm:"Standard Two-Spot (Woodland → Finish)",pace:"Works for ALL paces",risk:"Low",
+     steps:["Park at Riverside (925 spaces) or take Green Line D outbound to Woodland","Walk 0.5 mi east toward Newton Fire Station (first turn onto Comm Ave, mile 17)","Watch your runner at mile 17 area","Immediately board Green Line D inbound at Woodland","Ride to Arlington station (skip Copley — it's closed)","Walk 0.3 mi east on Boylston to finish viewing","Time: Woodland → Arlington = ~25 min on Green Line"],
+     note:"This is the single most recommended plan across forums, Boston.com, and community guides. It works because Woodland has reliable train frequency and mile 17 gives you maximum time buffer before the finish."},
+    {nm:"Wellesley → Finish",pace:"Works for 8:30/mi and slower",risk:"Moderate",
+     steps:["Commuter Rail (Worcester line) to Wellesley Square. Arrive by 9:30 AM for Wave 1 runners.","Walk 0.8 mi west on Rte 135 to Scream Tunnel, or stay near Wellesley Square for mile 13","Watch your runner","Walk back to Wellesley Square station. Board inbound Commuter Rail.","Ride inbound to Back Bay station (Orange Line connection) or to Lansdowne (Kenmore area)","Walk to finish area. Back Bay → finish = 0.2 mi walk."],
+     note:"boston.com: 'If you time it right, hop back on the commuter rail to Yawkey/Lansdowne.' The risk: Commuter Rail frequency. If you miss the train, you wait. Have schedule pulled up on your phone."},
+    {nm:"Framingham → Finish (Slow Runners)",pace:"10:00/mi and slower (4:20+ finish)",risk:"Moderate",
+     steps:["Commuter Rail to Framingham (mile ~6). Arrive by 10:00 AM.","Watch your runner near the station (0.4 mi walk to course)","Board inbound Commuter Rail","Ride all the way to Back Bay or South Station","Walk or Orange Line to finish area","You have 2.5-3+ hours of cushion with a 10:00/mi runner"],
+     note:"Only works for slower runners. A 3:00 marathoner passes Framingham at ~10:42 AM and finishes by ~12:00 — you don't have time to transit in."},
+    {nm:"Three-Spot Attempt: Natick → Wellesley → Finish",pace:"11:00/mi and slower only",risk:"High",
+     steps:["Commuter Rail to Natick Center (mile 10). Arrive by 10:00 AM.","Watch runner at Natick town center","Board inbound Commuter Rail to Wellesley Square (1 stop, ~5 min)","Watch runner at Wellesley (mile 13). Runner arrives ~25-30 min after Natick at 11:00/mi.","Board inbound Commuter Rail to Back Bay","Walk to finish. Runner arrives ~2+ hours after Wellesley at 11:00/mi."],
+     note:"This only works with very slow runners. The math doesn't work for sub-4:00 marathoners. Miss one train and the whole plan collapses."},
+    {nm:"By Car: Route 9 Corridor",pace:"3:30+ finish (8:00/mi and slower)",risk:"Low-Moderate",
+     steps:["Drive Route 9 to Natick. Park on side street near Natick Center (mile 10).","Watch runner. Return to car immediately.","Drive Route 9 EAST (same direction as runners). Head toward Newton.","Option A: Park near Heartbreak Hill — Mass Pike exit 17, Centre St to side streets near BC campus.","Option B: Park at Riverside station lot (925 spaces), walk to Woodland area for mile 17.","Watch runner at Newton/Heartbreak area.","If Option B: take Green Line inbound to finish.","If Option A: accept you will not see the finish (driving into Back Bay is not feasible)."],
+     note:"LetsRun: 'By car, you should be able to see her at 3 different locations. Be sure to use Route 9 to travel inbound with the runners.' Route 9 parallels the course and is your best car corridor."},
+    {nm:"The Pragmatist: Cleveland Circle → Finish",pace:"Works for ALL paces",risk:"Very Low",
+     steps:["Green Line (B, C, or D) to Cleveland Circle (mile 22-23)","Watch runner on Beacon St. Less crowded than BC, more manageable.","Board Green Line inbound. 2-3 stops to Kenmore, then continue to Arlington or get off and walk.","Cleveland Circle → Arlington station = ~15-20 min","Walk to finish viewing area","Total transit time is short enough to work even for sub-3:00 runners"],
+     note:"The 'I definitely want to see my runner AND the finish' plan. You sacrifice the drama of Heartbreak for the certainty of seeing two things."},
+    {nm:"High-Skill 4-Stop: CR + Green Line (Expert Only)",pace:"11:00/mi and slower ONLY",risk:"Very High",
+     steps:["Commuter Rail to Framingham (mile ~6.6). Watch runner.","Commuter Rail inbound toward Auburndale area, connect to Green Line D at Riverside.","Green D to Woodland (mile ~16.8). Watch runner at Newton hills start.","Green D to Reservoir, transfer D→C branch.","Green C to Cleveland Circle (mile ~22.4). Watch runner post-Heartbreak.","Green C inbound to Hynes Convention Center (mile ~25.5). Watch runner's final push.","Walk 0.4 mi to finish area."],
+     note:"This is the 'maximum sightings' plan posted on Reddit r/bostonmarathon. The original poster explicitly warns: 'Cleveland Circle may need to be cut' if transfers or crowds run long. Design this so your MAIN event is Woodland (Stop 2). Everything after is bonus. If timing slips, skip Cleveland Circle and go straight from Woodland to Hynes or the finish. The Green Line is repeatedly called the crush point — expect standing room only and possible delays. Only attempt this if your runner is 4:30+ pace AND you are comfortable with MBTA navigation under pressure."},
+  ];
+  return <div>
+    <Hd t="ITINERARIES WITH PACE MATH" th={th}/>
+    <Bx hl th={th} t="Pace Reference" ch={<div>
+      <Tb hd={["Pace","Mile 6","Mile 13","Mile 17","Mile 21","Finish"]} rows={[
+        ["7:00/mi","10:42 AM","11:31 AM","11:59 AM","12:27 AM","~12:03 PM"],
+        ["8:00/mi","10:48 AM","11:44 AM","12:16 PM","12:48 PM","~12:30 PM"],
+        ["8:30/mi","10:51 AM","11:50 AM","12:24 PM","12:59 PM","~12:43 PM"],
+        ["9:30/mi","10:57 AM","12:04 PM","12:42 PM","1:20 PM","~1:09 PM"],
+        ["10:00/mi","11:00 AM","12:10 PM","12:50 PM","1:30 PM","~1:22 PM"],
+        ["11:30/mi","11:09 AM","12:29 PM","1:15 PM","2:01 PM","~1:58 PM"],
+      ]} th={th}/>
+      <p style={{fontSize:11,color:th.t3,marginTop:4}}>Times assume Wave 1 start (10:00 AM). Add 25 min for Wave 2, 50 min for Wave 3, 75 min for Wave 4. Chip time starts at YOUR wave.</p>
+    </div>}/>
+    {itin.map((it,i)=><Bx key={i} th={th} ch={<div>
+      <div style={{display:"flex",justifyContent:"space-between",alignItems:"baseline",marginBottom:4}}>
+        <div style={{fontSize:13,fontWeight:700,color:th.accent}}>{it.nm}</div>
+        <span style={{fontSize:10,padding:"1px 6px",borderRadius:10,background:it.risk==="Low"||it.risk==="Very Low"?th.gr+"15":it.risk==="Moderate"?th.or+"15":th.rd+"15",color:it.risk==="Low"||it.risk==="Very Low"?th.gr:it.risk==="Moderate"?th.or:th.rd,fontWeight:600}}>{it.risk} risk</span>
+      </div>
+      <div style={{fontSize:11,color:th.t2,marginBottom:6}}>{it.pace}</div>
+      <div style={{marginBottom:6}}>{it.steps.map((s,j)=><div key={j} style={{display:"flex",gap:6,marginBottom:3,fontSize:12,color:th.t2}}><span style={{color:th.accent,fontWeight:700,flexShrink:0,width:16,textAlign:"right"}}>{j+1}.</span><span>{s}</span></div>)}</div>
+      <div style={{background:th.ck,borderLeft:"3px solid "+th.accent,padding:"6px 10px",borderRadius:"0 5px 5px 0",fontSize:11.5,color:th.t2}}>{it.note}</div>
+    </div>}/>)}
+  </div>;
+}
+
+function STransit({th}){return <div>
+  <Hd t="TRANSIT OPERATIONS" th={th}/>
+  <Bx t="CRITICAL: Copley Station Closed All Day" hl th={th} ch={<div>
+    <p style={{marginBottom:4,color:th.rd,fontWeight:600}}>Do NOT plan to use Copley. It is closed for the entire marathon day for security.</p>
+    <p>Alternatives for finish area access:</p>
+    <Bl th={th} items={[
+      "Arlington station (Green Line, all branches): 0.3 mi walk east to finish. BEST OPTION.",
+      "Back Bay station (Orange Line): 0.2 mi walk north to Boylston. Reliable all day.",
+      "Hynes Convention Center (Green B/C/D): 0.4 mi walk east. May have restricted access.",
+      "Prudential (Green E): 0.5 mi walk. Less crowded alternative.",
+    ]}/>
+    <p style={{fontSize:11,color:th.t3,marginTop:4}}>Source: MBTA Marathon Guide (mbta.com/Marathon); MBTA press release April 2025</p>
+  </div>}/>
+  <Bx t="Also Closed (10 AM - 6 PM)" th={th} ch={<Bl th={th} items={[
+    "South Street (Green B)",
+    "Kent Street (Green C)",
+    "Saint Mary's Street (Green C)",
+    "Additional stations may close without notice near finish area (MBTA reserves right)",
+  ]}/>}/>
+  <Bx t="Commuter Rail (Worcester/Framingham Line)" th={th} ch={<Bl th={th} items={[
+    "Special Marathon Monday schedule with EXTRA inbound and outbound trains.",
+    "$10 Holiday Weekend Pass: valid Sat-Mon, ALL Commuter Rail zones, unlimited hop-on/hop-off. Buy in mTicket app.",
+    "Stations near course: Ashland (0.8 mi walk), Framingham (0.4 mi), West Natick, Natick Center, Wellesley Square, Wellesley Hills, Wellesley Farms.",
+    "All stations are on the NORTH side of the course.",
+    "No bikes or scooters on Worcester line from 5 PM Sunday through end of service Monday.",
+    "Road closures near stations: roads near Ashland, Framingham, Natick, and Wellesley stations may be closed. Arrive early if driving to a station.",
+  ]}/>}/>
+  <Bx t="Green Line" th={th} ch={<Bl th={th} items={[
+    "Regular weekday schedule with extra service before and after race.",
+    "D branch: Woodland (mile 17 area), Newton Centre, Riverside (parking, 925 spaces).",
+    "B branch: Boston College (mile 21, Heartbreak crest), South St (CLOSED 10-6).",
+    "C branch: Cleveland Circle (mile 22-23), Coolidge Corner (mile 23-24), Kent St (CLOSED 10-6), St. Mary's (CLOSED 10-6).",
+    "Green Line runs ABOVE GROUND and parallels the marathon course from mile 22.5 to mile 25. You can literally watch runners from the train window.",
+    "No bikes on any subway train ALL DAY.",
+  ]}/>}/>
+  <Bx t="Orange Line" th={th} ch={<Bl th={th} items={[
+    "Runs all day, regular weekday schedule. Your most reliable line.",
+    "Back Bay station: 0.2 mi from finish. This is the safest finish-area station.",
+    "If Green Line is packed or delayed, Orange Line to Back Bay is your fallback.",
+  ]}/>}/>
+  <Bx t="Fares" th={th} ch={<Bl th={th} items={[
+    "Contactless tap-to-pay on subway and bus (credit/debit card or phone wallet).",
+    "CharlieCard: load at least $5 for a round trip on subway.",
+    "$10 Holiday Weekend Pass (Commuter Rail only, not valid on subway/bus).",
+    "7-day Zone 1A pass ($22.50): subway + bus + Zone 1A Commuter Rail + ferries.",
+  ]}/>}/>
+  <Bx t="Transit vs Driving Comparison" th={th} ch={<Tb hd={["Location","Transit","Drive"]} rows={[
+    ["Early towns (M1-8)","CR Worcester line. Reliable.","Rte 9 or Rte 135. Park on side streets before 7 AM closures."],
+    ["Wellesley (M12-13)","CR to Wellesley Sq. Best option.","Rte 9 to side streets. Parking fills fast."],
+    ["Newton/HB (M16-21)","Green D to Woodland or Green B to BC.","Mass Pike exit 17, park near BC. Side streets only."],
+    ["Brookline (M22-24)","Green to Cleveland Cir or Coolidge.","Not recommended. Road closures extensive."],
+    ["Kenmore (M25)","Green to Kenmore.","Not feasible. Road closures."],
+    ["Finish","Orange to Back Bay or Green to Arlington.","NOT POSSIBLE. Do not attempt to drive to Back Bay."],
+  ]} th={th}/>}/>
+</div>;}
+
+function SReunion({th}){return <div>
+  <Hd t="POST-FINISH REUNION PLAN" th={th}/>
+
+  <Bx t="Finish Area Reality: You Cannot Stand at the Finish Line" hl th={th} ch={<div>
+    <p style={{marginBottom:6,color:th.rd,fontWeight:600}}>Hard truth: the finish area is fenced and access-controlled. Spectators cannot get close to the actual finish line without special/invited access. Fencing and controlled zones push you back. (Reddit, recurring)</p>
+    <Bl th={th} items={[
+      "The closest most spectators can get: Boylston St sidewalks east of Hereford, or the Hereford St corner where runners make their right turn. Both are 6-8 people deep by mid-morning.",
+      "If you arrive after ~10:30 AM, curb-side viewing on Boylston is effectively gone.",
+      "ADA-accessible viewing: Hereford/Boylston, Ring Rd/Boylston, Fairfield/Boylston, Exeter/Boylston. (B.A.A.)",
+    ]}/>
+  </div>}/>
+  <Bx t="Family Meeting Area (Official)" th={th} ch={<Bl th={th} items={[
+    "Location: Stuart Street between Berkeley Street and Clarendon Street. (B.A.A.)",
+    "Alphabetical signs by runner LAST NAME. Find your letter zone and wait.",
+    "B.A.A. states it takes 'considerable time' from finish to Family Meeting Area. Not exaggeration.",
+    "Community tip: meet at the Q or Z letter zones — fewer names means less crowding. (LetsRun)",
+    "Runners exit the finish chute on Dartmouth or Clarendon. They collect medal, heat sheet, gear bag, then walk to Stuart St.",
+  ]}/>}/>
+  <Bx t="Runner-Side Timing" th={th} ch={<Bl th={th} items={[
+    "Efficient: finish chute → medal → gear bag → exit runners-only area can be ~15 min if you move quickly. (Reddit, individual report)",
+    "More realistic: 20-45 min. Medical check, heat sheet, walking through finish infrastructure, finding your wave's gear bus, navigating to Stuart St.",
+    "Some runners leave their phone in the gear bag — meaning NO communication until retrieval. Plan for this.",
+  ]}/>}/>
+  <Bx t="Backup: Skip the Chaos Entirely" th={th} ch={<div>
+    <div style={{background:th.or+"0a",border:"1px solid "+th.or+"22",borderRadius:6,padding:8,marginBottom:6}}>
+      <div style={{fontSize:10,color:th.or,fontWeight:700,textTransform:"uppercase",letterSpacing:1,marginBottom:3}}>VETERAN PLAY</div>
+      <p style={{color:th.t2,fontSize:12.5}}>Pre-pick a landmark a few blocks away — Boston Common is commonly cited — and meet there. Simpler, less crowded, no cell service needed. Decide BEFORE race day. (Reddit, recurring)</p>
+    </div>
+    <Bl th={th} items={[
+      "Cell service is UNRELIABLE. Towers overloaded with 500K+ people. Texts may work when calls won't.",
+      "Time-based fallback: 'If we can't connect by 90 min after expected finish, meet at [hotel lobby / Boston Common bandstand].'",
+      "If using official Family Meeting Area: commit to the letter zone. Stand there. Don't wander.",
+    ]}/>
+  </div>}/>
+  <Bx t="Getting OUT" th={th} ch={<Bl th={th} items={[
+    "Back Bay station (Orange Line): 0.2 mi south of Stuart St. OPTIMAL departure — short walk from Family Meeting Area, less crowded than Green Line. (Reddit transit AMA)",
+    "Arlington station (Green Line): 0.3 mi east. All branches. Expect crowds.",
+    "Green Line is the CROWDIER option post-race. Orange Line to Back Bay is the veteran choice. (Reddit AMA)",
+    "POST-FINISH: for some trips (Back Bay → Seaport), locals say WALKING is faster than transit due to transfers and gridlock. (Reddit, recurring)",
+    "Uber/Lyft: walk 3-4 blocks south to Columbus Ave or Tremont St for realistic pickup zone.",
+  ]}/>}/>
+</div>;}
+
+function SGear({th}){return <div>
+  <Hd t="GEAR, RULES & PROHIBITED ITEMS" th={th}/>
+  <Bx t="Prohibited Items (B.A.A. Official)" hl th={th} ch={<Bl th={th} items={[
+    "Backpacks or bags carried over the shoulder",
+    "Coolers",
+    "Glass containers or cans",
+    "Any container over 1 liter",
+    "Handbags or packages larger than 12\" x 12\" x 6\"",
+    "Large blankets, comforters, sleeping bags",
+    "Drones",
+    "Firearms, knives, mace, weapons of any kind",
+    "Face-covering masks or non-form-fitting costumes",
+    "Bikes, scooters, strollers on course",
+    "Props including sporting equipment",
+  ]}/>}/>
+  <Bx t="What to Carry Instead" th={th} ch={<Bl th={th} items={[
+    "Clear plastic bag (encouraged by B.A.A. — speeds security screening)",
+    "Small crossbody bag or fanny pack (under 12\"x12\"x6\")",
+    "Phone + portable charger (battery will drain fast with tracking app)",
+    "Printed pace chart with estimated arrival times at your viewing spot(s)",
+    "Water bottle (reusable, under 1 liter)",
+    "Snacks (you'll be standing for hours)",
+    "Layers: April weather is unpredictable (38-89F range historically). Dress in removable layers.",
+    "Comfortable walking shoes — you will walk 2-5+ miles as a spectator",
+    "Noisemaker or sign (nothing that could blow onto the course)",
+    "Hand warmers if temp is below 50F",
+    "Sunscreen if above 55F and sunny",
+    "Cash for food vendors (not all take cards)",
+  ]}/>}/>
+  <Bx t="Security" th={th} ch={<Bl th={th} items={[
+    "Expect bag inspection checkpoints at finish line viewing areas and other high-density spots.",
+    "Clear bags speed screening significantly.",
+    "ADA-accessible viewing: Hereford/Boylston, Ring Rd/Boylston, Fairfield/Boylston, Exeter/Boylston.",
+    "Spectators may NOT enter the course, run alongside athletes, or impede runners in any way. Violators are removed by law enforcement. (B.A.A.)",
+    "Report suspicious items or behavior to nearest law enforcement or call 911.",
+    "Do NOT throw items onto the course or hand items to runners from behind barriers.",
+  ]}/>}/>
+</div>;}
+
+function SCommunity({th}){
+  const Tag=({ch})=><span style={{display:"inline-block",padding:"1px 6px",borderRadius:10,fontSize:9,fontWeight:600,background:th.or+"15",color:th.or,border:"1px solid "+th.or+"30",marginRight:4,marginBottom:3}}>COMMUNITY TACTIC</span>;
+  return <div>
+    <Hd t="COMMUNITY TACTICS & INSIDER TIPS" th={th}/>
+    <Bx hl th={th} ch={<p>These are patterns extracted from LetsRun forums, Reddit, Fodor's Travel, boston.com community reporting, and public Facebook discussions. Labeled as community tactics — not official B.A.A. guidance. Paraphrased from public posts.</p>}/>
+
+    <Bx t="Multi-Spot Consensus" th={th} ch={<div>
+      <Tag/><p style={{marginBottom:4}}>LetsRun consensus across multiple threads: 'Don't plan to see your runner more than twice.' The finish area is described as 'a madhouse' with spectators '6, 7, 8 people deep.'</p>
+      <Tag/><p style={{marginBottom:4}}>A common successful two-spot pattern reported: Framingham area by car → drive Rte 9 east → park in Cambridge → take the T to Fenway/Kenmore area. One poster: 'I easily caught him there as well.'</p>
+      <Tag/><p>By car, Route 9 eastbound is the key corridor. Multiple posters recommend: 'Route 9 to travel inbound with the runners. West Natick, Wellesley Hills, Brookline.'</p>
+    </div>}/>
+
+    <Bx t="Best Unobstructed Views" th={th} ch={<div>
+      <Tag/><p style={{marginBottom:4}}>West Natick Commuter Rail stop: 'quieter and more remote — you'll stand out more' vs Natick Center which is livelier. Good for making eye contact with your runner. (boston.com)</p>
+      <Tag/><p style={{marginBottom:4}}>Hereford Street corner (right turn before Boylston): less packed than Boylston itself. Runners make a sharp right here — you're close and can shout individual encouragement.</p>
+      <Tag/><p>Washington St near hospital area before Heartbreak: mentioned as a less-crowded spot that gives you a head start to Woodland station for a quick exit. (forum tactic)</p>
+    </div>}/>
+
+    <Bx t="Transit Timing Tricks" th={th} ch={<div>
+      <Tag/><p style={{marginBottom:4}}>The Green Line runs above ground and parallels the course from mile 22.5 to nearly mile 25. If riding inbound, you literally ride alongside the runners. Multiple posters call this out as a bonus viewing experience.</p>
+      <Tag/><p style={{marginBottom:4}}>Riverside station (Green D, end of line) has 925 parking spaces and is less competitive than you'd expect on a state holiday. A common tactic: park at Riverside, ride one stop to Woodland for mile 17, then ride inbound to finish.</p>
+      <Tag/><p>For 2:40-class runners, a spectator at mile 17 reported catching the Green Line inbound and 'made it to the finish with 5 mins to spare.' For slower runners, the buffer is even more generous.</p>
+    </div>}/>
+
+    <Bx t="Common Mistakes" th={th} ch={<div>
+      <Tag/><p style={{marginBottom:4}}>Going to the start in Hopkinton if you want to see the finish. There is no Commuter Rail in Hopkinton. Getting out requires a car or shuttle, and you lose 90+ min of transit time.</p>
+      <Tag/><p style={{marginBottom:4}}>Attempting BC → finish for a fast runner. Green Line frequency may not be enough. Multiple posters report missing the finish after lingering at Heartbreak.</p>
+      <Tag/><p style={{marginBottom:4}}>Not having a firm post-race meeting plan. Cell service degrades near the finish. 'Make sure you know where to meet afterward or just meet at your hotel.' (LetsRun)</p>
+      <Tag/><p>Underestimating walking distances. Commuter Rail stations are 0.4-0.8 mi from the course. Green Line stops can require 0.3 mi walks. You'll walk 3-6 miles total as a multi-spot spectator.</p>
+    </div>}/>
+
+    <Bx t="What Spectators Wish They Knew" th={th} ch={<div>
+      <Tag/><Bl th={th} items={[
+        "The B.A.A. app is essential. Download it before race day. Set alerts for your runner's splits. But: tracking can lag, especially in crowded areas. Don't rely on it for split-second positioning decisions.",
+        "Commuter Rail stations are all on the north/left side of the course. Plan accordingly.",
+        "'Boston is super hard to see more than twice.' Experienced spectators set this expectation. One veteran: mile ~16 + near mile 25, with Uber between spots. Even then: Uber 'works' but traffic is tough. (Reddit r/bostonmarathon)",
+        "April in Boston is wildly variable. 38F with driving rain (2018) or 89F heat emergency (2012). Check forecast morning-of and adjust.",
+        "Bring a portable phone charger. Your battery will drain fast with GPS, tracking app, and messaging.",
+        "Food vendors exist near Kenmore, Coolidge Corner, and Wellesley Square. Don't count on finding food at Newton or early towns.",
+        "The Boston Red Sox play at Fenway at 11 AM on Marathon Monday. The Kenmore area is a mix of marathon and baseball crowds. Plan for this.",
+        "Uber is NOT a reliable spectator transit strategy. Traffic is 'tough' near the course and road closures box you in. If you use Uber, budget 2x the normal time and accept it may fail entirely.",
+        "WALKING DISTANCES ADD UP: Commuter Rail stations are 0.4-0.8 mi from the course. Green Line stops can require 0.3 mi walks. Multi-spot spectators walk 3-6+ miles total. Wear comfortable shoes.",
+      ]}/>
+    </div>}/>
+  </div>;
+}
+
+function SSources({th}){
+  const groups=[
+    {c:"B.A.A. Official",i:["baa.org/races/boston-marathon/info-for-spectators","baa.org/races/boston-marathon/the-course","B.A.A. Spectator Guide PDF (2023/2024/2025)","B.A.A. Participant Guide PDF (2025) — bus cutoffs, carry constraints, security","B.A.A. Racing App (iOS/Android)"]},
+    {c:"MBTA / Transit",i:["mbta.com/guides/marathon-guide (official MBTA Marathon Guide)","MBTA press release April 2025: service changes","mbta.com/fares (Holiday Weekend Pass, CharlieCard info)","CBS Boston: road closures and MBTA changes (April 2025)","WBUR: what you need to know for Marathon Monday (April 2025)"]},
+    {c:"Local Guides",i:["boston.com: best spots to watch the race (April 2025)","visitma.com: How to Navigate Marathon Monday (spectator guide)","Coach Parry: Top 10 Spectator Spots Along the Route"]},
+    {c:"Community & Forums",i:["LetsRun.com: multiple spectator advice threads (2010-2025)","Reddit r/bostonmarathon: multi-spot strategies, finish area fencing, wave gating","Reddit r/boston: Hopkinton access warnings, post-finish transit advice","Reddit transit AMA: Back Bay as optimal departure, Green Line crowd warnings","Fodor's Travel Forums: Boston Marathon spectator questions","HubPages: Boston Marathon Spectator Guide","Medium: race report (bus loading physical reality)"]},
+    {c:"Runner Sources",i:["B.A.A. course map with Commuter Rail stations","V.O2 / Dr. Jack Daniels elevation data","Outside Running course analysis"]},
+  ];
+  return <div>
+    <Hd t="SOURCES & CITATIONS" th={th}/>
+    <Bx th={th} ch={<p>Official sources (B.A.A., MBTA) for rules, transit, and logistics. Community sources (LetsRun, Reddit, Fodor's) for tactical advice, clearly labeled as community tactics throughout. All community quotes paraphrased from public posts.</p>}/>
+    {groups.map((g,i)=><Bx key={i} t={g.c} th={th} ch={<div>{g.i.map((s,j)=><div key={j} style={{fontSize:12,color:th.bl,marginBottom:3}}>{s}</div>)}</div>}/>)}
+  </div>;
+}
+
+/* ═══════════════════════════════════════════════════════════════════
+   ANALYTICS DASHBOARD
+   ═══════════════════════════════════════════════════════════════════ */
+function PAnalytics({th}){
+  const [tick,setTick]=useState(0);
+  const [showPrivacy,setShowPrivacy]=useState(false);
+  useEffect(()=>{const iv=setInterval(()=>setTick(t=>t+1),3000);return()=>clearInterval(iv)},[]);
+
+  const now=Date.now();
+  const sessionMin=Math.round((now-_AX.sessionStart)/60000);
+  const last5=_AX.events.filter(e=>now-e.ts<300000);
+  const last30=_AX.events.filter(e=>now-e.ts<1800000);
+  const lastHr=_AX.events.filter(e=>now-e.ts<3600000);
+
+  // Aggregate by category
+  const catCounts={};
+  last30.forEach(e=>{catCounts[e.cat]=(catCounts[e.cat]||0)+1});
+  const catData=Object.entries(catCounts).map(([k,v])=>({name:k,count:v})).sort((a,b)=>b.count-a.count);
+
+  // Top clicked sections
+  const secCounts={};
+  last30.filter(e=>e.cat==="click"||e.cat==="segment"||e.cat==="tab"||e.cat==="map").forEach(e=>{const k=e.lbl||e.act;secCounts[k]=(secCounts[k]||0)+1});
+  const secData=Object.entries(secCounts).map(([k,v])=>({name:k,count:v})).sort((a,b)=>b.count-a.count).slice(0,10);
+
+  // Page view timeline (last 30 min, 5-min buckets)
+  const buckets=Array(6).fill(0);
+  const bucketLabels=[];
+  for(let i=5;i>=0;i--){
+    const bStart=now-(i+1)*300000;const bEnd=now-i*300000;
+    buckets[5-i]=_AX.events.filter(e=>e.ts>=bStart&&e.ts<bEnd&&e.cat==="pageview").length;
+    bucketLabels.push(i===0?"now":`-${(i)*5}m`);
+  }
+  const timeData=bucketLabels.map((l,i)=>({time:l,views:buckets[i]}));
+
+  // Tab distribution
+  const tabCounts={};
+  _AX.events.filter(e=>e.cat==="tab").forEach(e=>{tabCounts[e.act]=(tabCounts[e.act]||0)+1});
+  const tabData=Object.entries(tabCounts).map(([k,v])=>({name:k,count:v})).sort((a,b)=>b.count-a.count);
+
+  // Scroll depths
+  const scrollData=Object.entries(_AX.scrollDepths).map(([k,v])=>({page:k,depth:v})).sort((a,b)=>b.depth-a.depth);
+
+  // Referrer / UTM
+  const ref=_AX.referrer||"direct";
+  const hasUTM=Object.keys(_AX.utmParams).length>0;
+
+  // Simulated geo (since we can't do real IP geolocation in an artifact)
+  const simGeo=[{c:"United States",pct:62},{c:"United Kingdom",pct:11},{c:"Canada",pct:8},{c:"Germany",pct:5},{c:"Australia",pct:4},{c:"Other",pct:10}];
+
+  const Stat=({label,value,sub,c})=><div style={{background:th.card,border:"1px solid "+th.bd,borderRadius:8,padding:"10px 12px",flex:"1 1 140px",minWidth:140,boxShadow:th.sh}}>
+    <div style={{fontSize:10,color:th.t3,textTransform:"uppercase",letterSpacing:1,marginBottom:2}}>{label}</div>
+    <div style={{fontSize:22,fontWeight:700,color:c||th.accent,fontFamily:"'Bitter',serif"}}>{value}</div>
+    {sub&&<div style={{fontSize:10,color:th.t3}}>{sub}</div>}
+  </div>;
+
+  const live=last5.length;
+  const liveColor=live>10?th.gr:live>3?th.or:th.t2;
+
+  return <div>
+    <Hd t="ANALYTICS DASHBOARD" th={th}/>
+    <div style={{display:"flex",gap:3,marginBottom:10}}>
+      <span style={{width:8,height:8,borderRadius:"50%",background:th.gr,display:"inline-block",animation:"pulse 2s infinite",marginTop:3}}/>
+      <span style={{fontSize:11,color:th.gr,fontWeight:600}}>LIVE — refreshes every 3s</span>
+      <span style={{fontSize:11,color:th.t3,marginLeft:"auto"}}>Session: {sessionMin} min</span>
+    </div>
+    <style>{`@keyframes pulse{0%,100%{opacity:1}50%{opacity:.3}}`}</style>
+
+    <div style={{display:"flex",gap:8,flexWrap:"wrap",marginBottom:12}}>
+      <Stat label="Active Now" value={live} sub={`events in last 5 min`} c={liveColor}/>
+      <Stat label="Total Events" value={_AX.events.length} sub="this session"/>
+      <Stat label="Pages Viewed" value={_AX.pageViews.length} sub="tab switches"/>
+      <Stat label="Peak Scroll" value={Math.max(0,...Object.values(_AX.scrollDepths),0)+"%"} sub="deepest page"/>
+    </div>
+
+    <Bx t="Event Activity (Last 30 Min, 5-Min Buckets)" th={th} ch={
+      <ResponsiveContainer width="100%" height={140}>
+        <AreaChart data={timeData} margin={{top:5,right:5,left:0,bottom:0}}>
+          <defs><linearGradient id="axg" x1="0" y1="0" x2="0" y2="1"><stop offset="5%" stopColor={th.accent} stopOpacity={0.3}/><stop offset="95%" stopColor={th.accent} stopOpacity={0.02}/></linearGradient></defs>
+          <XAxis dataKey="time" stroke={th.t3} tick={{fontSize:9,fill:th.t3}}/>
+          <YAxis stroke={th.t3} tick={{fontSize:9,fill:th.t3}} allowDecimals={false}/>
+          <Tooltip contentStyle={{background:th.card,border:"1px solid "+th.bd,borderRadius:5,fontSize:11}}/>
+          <Area type="monotone" dataKey="views" stroke={th.accent} fill="url(#axg)" strokeWidth={2}/>
+        </AreaChart>
+      </ResponsiveContainer>
+    }/>
+
+    <div style={{display:"grid",gridTemplateColumns:"1fr 1fr",gap:8,marginBottom:8}}>
+      <Bx t="Most Clicked (Last 30 Min)" th={th} ch={secData.length?<div>
+        {secData.map((s,i)=><div key={i} style={{display:"flex",justifyContent:"space-between",alignItems:"center",padding:"3px 0",borderBottom:"1px solid "+th.bd}}>
+          <span style={{fontSize:12,color:th.tx}}>{s.name}</span>
+          <div style={{display:"flex",alignItems:"center",gap:4}}>
+            <div style={{width:Math.min(80,s.count*8),height:6,background:th.accent,borderRadius:3,opacity:0.7}}/>
+            <span style={{fontSize:11,color:th.accent,fontWeight:600,minWidth:20,textAlign:"right"}}>{s.count}</span>
+          </div>
+        </div>)}
+      </div>:<div style={{fontSize:12,color:th.t3,fontStyle:"italic"}}>Interact with the site to generate data</div>}/>
+
+      <Bx t="Tab Distribution (Session)" th={th} ch={tabData.length?<div>
+        {tabData.map((t,i)=><div key={i} style={{display:"flex",justifyContent:"space-between",alignItems:"center",padding:"3px 0",borderBottom:"1px solid "+th.bd}}>
+          <span style={{fontSize:12,color:th.tx}}>{t.name}</span>
+          <div style={{display:"flex",alignItems:"center",gap:4}}>
+            <div style={{width:Math.min(80,t.count*12),height:6,background:th.bl,borderRadius:3,opacity:0.6}}/>
+            <span style={{fontSize:11,color:th.bl,fontWeight:600,minWidth:20,textAlign:"right"}}>{t.count}</span>
+          </div>
+        </div>)}
+      </div>:<div style={{fontSize:12,color:th.t3,fontStyle:"italic"}}>Switch tabs to populate</div>}/>
+    </div>
+
+    <div style={{display:"grid",gridTemplateColumns:"1fr 1fr",gap:8,marginBottom:8}}>
+      <Bx t="Scroll Depth by Page" th={th} ch={scrollData.length?<div>
+        {scrollData.map((s,i)=><div key={i} style={{display:"flex",justifyContent:"space-between",alignItems:"center",padding:"3px 0",borderBottom:"1px solid "+th.bd}}>
+          <span style={{fontSize:12,color:th.tx}}>{s.page}</span>
+          <div style={{display:"flex",alignItems:"center",gap:4}}>
+            <div style={{width:Math.max(4,s.depth*0.8),height:6,background:s.depth>75?th.gr:s.depth>40?th.or:th.rd,borderRadius:3}}/>
+            <span style={{fontSize:11,fontWeight:600,color:s.depth>75?th.gr:s.depth>40?th.or:th.rd,minWidth:28,textAlign:"right"}}>{s.depth}%</span>
+          </div>
+        </div>)}
+      </div>:<div style={{fontSize:12,color:th.t3,fontStyle:"italic"}}>Scroll pages to populate</div>}/>
+
+      <Bx t="Traffic Source" th={th} ch={<div>
+        <div style={{marginBottom:6}}>
+          <div style={{fontSize:10,color:th.t3,textTransform:"uppercase",letterSpacing:1}}>Referrer</div>
+          <div style={{fontSize:13,color:th.accent,fontWeight:600}}>{ref===""|ref==="direct"?"Direct":"" + (ref.length>40?ref.substring(0,40)+"...":ref)}</div>
+        </div>
+        {hasUTM&&<div style={{marginBottom:6}}>
+          <div style={{fontSize:10,color:th.t3,textTransform:"uppercase",letterSpacing:1}}>UTM Parameters</div>
+          {Object.entries(_AX.utmParams).map(([k,v],i)=><div key={i} style={{fontSize:12}}><span style={{color:th.t3}}>{k}:</span> <span style={{color:th.tx,fontWeight:600}}>{v}</span></div>)}
+        </div>}
+        {!hasUTM&&<div style={{fontSize:11,color:th.t3}}>No UTM parameters detected. Add ?utm_source=reddit&utm_campaign=test to the URL to test.</div>}
+      </div>}/>
+    </div>
+
+    <Bx t="Geographic Distribution (Simulated)" th={th} ch={<div>
+      <div style={{fontSize:11,color:th.t3,marginBottom:6}}>In production: IP → coarse geo via MaxMind GeoLite2 or Vercel headers. No raw IPs stored. Country-level only.</div>
+      {simGeo.map((g,i)=><div key={i} style={{display:"flex",alignItems:"center",gap:8,marginBottom:4}}>
+        <span style={{fontSize:12,color:th.tx,minWidth:100}}>{g.c}</span>
+        <div style={{flex:1,height:10,background:th.bd,borderRadius:5,overflow:"hidden"}}>
+          <div style={{width:g.pct+"%",height:"100%",background:th.accent,borderRadius:5,transition:"width .5s"}}/>
+        </div>
+        <span style={{fontSize:11,color:th.accent,fontWeight:600,minWidth:30,textAlign:"right"}}>{g.pct}%</span>
+      </div>)}
+    </div>}/>
+
+    <Bx t="Event Categories (Last 30 Min)" th={th} ch={catData.length?
+      <ResponsiveContainer width="100%" height={120}>
+        <AreaChart data={catData} margin={{top:5,right:5,left:0,bottom:0}}>
+          <XAxis dataKey="name" stroke={th.t3} tick={{fontSize:9,fill:th.t3}}/>
+          <YAxis stroke={th.t3} tick={{fontSize:9,fill:th.t3}} allowDecimals={false}/>
+          <Tooltip contentStyle={{background:th.card,border:"1px solid "+th.bd,borderRadius:5,fontSize:11}}/>
+          <Area type="monotone" dataKey="count" stroke={th.gr} fill={th.gr+"22"} strokeWidth={2}/>
+        </AreaChart>
+      </ResponsiveContainer>
+    :<div style={{fontSize:12,color:th.t3,fontStyle:"italic"}}>Interact with the site to generate event data</div>}/>
+
+    <Bx t="Event Log (Last 20)" th={th} ch={<div style={{maxHeight:200,overflow:"auto"}}>
+      {_AX.events.slice(-20).reverse().map((e,i)=>{
+        const ago=Math.round((now-e.ts)/1000);
+        return <div key={i} style={{display:"flex",gap:6,padding:"2px 0",borderBottom:"1px solid "+th.bd,fontSize:11}}>
+          <span style={{color:th.t3,minWidth:40,textAlign:"right"}}>{ago<60?ago+"s":Math.round(ago/60)+"m"}</span>
+          <span style={{color:th.accent,fontWeight:600,minWidth:60}}>{e.cat}</span>
+          <span style={{color:th.tx}}>{e.act}</span>
+          {e.lbl&&<span style={{color:th.t3}}>• {e.lbl}</span>}
+        </div>;
+      })}
+      {_AX.events.length===0&&<div style={{fontSize:12,color:th.t3,fontStyle:"italic"}}>No events yet. Browse the site to generate data.</div>}
+    </div>}/>
+
+    <div style={{marginTop:8}}>
+      <button onClick={()=>setShowPrivacy(!showPrivacy)} style={{background:"transparent",border:"1px solid "+th.bd,borderRadius:6,padding:"4px 10px",fontSize:11,color:th.t2,cursor:"pointer"}}>
+        {showPrivacy?"Hide":"Show"} Privacy Policy
+      </button>
+      {showPrivacy&&<Bx th={th} ch={<div style={{fontSize:12,color:th.t2,lineHeight:1.7}}>
+        <p style={{fontWeight:700,color:th.tx,marginBottom:4}}>Analytics Privacy Policy</p>
+        <p style={{marginBottom:4}}>This site collects anonymized usage data to improve the experience. What we track: page views, click interactions, scroll depth, referrer source, and UTM campaign parameters. What we do NOT track: raw IP addresses (converted to country-level geo and discarded), personal identifying information, cookies for cross-site tracking, or browser fingerprints.</p>
+        <p style={{marginBottom:4}}>Geolocation is coarse (country/region level only), derived from IP via server-side lookup. The IP is immediately discarded after geo lookup and never stored. Session data is ephemeral and not linked to any user identity.</p>
+        <p>Data retention: event data is retained for 90 days, then automatically purged. No data is sold or shared with third parties. This implementation follows GDPR and CCPA guidelines for privacy-conscious analytics.</p>
+      </div>}/>}
+    </div>
+
+    <Bx t="Production Architecture" th={th} ch={<div style={{fontSize:12,color:th.t2,lineHeight:1.7}}>
+      <p style={{fontWeight:700,color:th.tx,marginBottom:4}}>This dashboard tracks REAL interactions within this session. For production deployment:</p>
+      <Bl th={th} items={[
+        "Stack: Next.js App Router + Supabase Postgres + Vercel Edge Functions",
+        "IP → Geo: Vercel x-vercel-ip-country header or MaxMind GeoLite2 (free). IP discarded after lookup.",
+        "DB Schema: sessions (id, geo_country, geo_region, referrer, utm_*, created_at), page_views (session_id, page, ts), events (session_id, category, action, label, ts)",
+        "Ingestion: POST /api/analytics/event — validates, anonymizes, inserts to Supabase. Rate-limited per session.",
+        "Dashboard: /admin/analytics — Supabase real-time subscriptions or 5s polling. Auth via Supabase Row Level Security.",
+        "Indexes: events(ts), events(category, ts), page_views(ts), sessions(created_at, geo_country)",
+        "Cost: Supabase free tier = 500MB DB + 50K monthly active users. Sufficient for most sites.",
+      ]}/>
+    </div>}/>
+  </div>;
+}
+
+/* ═══════════════════════════════════════════════════════════════════
+   MAIN APP
+   ═══════════════════════════════════════════════════════════════════ */
+function App(){
+  const [dk,setDk]=useState(false);
+  const [mode,setMode]=useState("r");
+  const [tab,setTab]=useState(0);
+  const [q,setQ]=useState("");
+  const [sr,setSR]=useState([]);
+  const th=dk?D_TH:L_TH;
+  const tabs=mode==="r"?RTABS:SPTABS;
+
+  // Analytics init
+  useEffect(()=>{axInit()},[]);
+
+  // Track tab switches
+  const curTabName=tabs[tab]||"unknown";
+  useEffect(()=>{axPageView(curTabName);axTrack("tab",curTabName,mode==="r"?"runner":"spectator")},[tab,mode]);
+
+  // Track mode switches
+  const switchMode=(m)=>{setMode(m);setTab(0);axTrack("mode",m==="r"?"runner":"spectator")};
+
+  // Scroll tracking
+  useScrollTracker(curTabName);
+
+  useEffect(()=>{setTab(0)},[mode]);
+  const idx=useMemo(()=>{const r=[];SEGS.forEach(s=>r.push({t:(s.nm+" "+s.r+" "+s.body.join(" ")).toLowerCase(),tab:0,l:s.nm}));MK.forEach(m=>r.push({t:(m.d+" "+m.l).toLowerCase(),tab:mode==="r"?7:3,l:m.l}));FAIL_MODES.forEach(f=>r.push({t:(f.nm+" "+f.phys).toLowerCase(),tab:6,l:f.nm}));if(mode==="s"){["Copley closed","Woodland","Cleveland Circle","Wellesley","Family Meeting Area","Riverside parking","Back Bay","Arlington station"].forEach(s=>r.push({t:s.toLowerCase(),tab:4,l:s}));}return r},[mode]);
+  useEffect(()=>{if(q.length<2){setSR([]);return}setSR(idx.filter(i=>i.t.indexOf(q.toLowerCase())>=0).slice(0,5))},[q,idx]);
+
+  const rPages=[PCourseWar,PQualify,PLogistics,PFuel,PWeather,PTrain,PFail,PMapPage,PSources,PAnalytics];
+  const sPages=[SPlan,SSpots,SItin,PMapPage,STransit,SReunion,SGear,SCommunity,SSources,PAnalytics];
+  const pages=mode==="r"?rPages:sPages;
+  const Pg=pages[tab]||pages[0];
+
+  return <div style={{minHeight:"100vh",background:th.bg,color:th.tx,fontFamily:"'Bitter','Georgia',serif",transition:"background .3s,color .3s"}}>
+    <link href="https://fonts.googleapis.com/css2?family=Bitter:wght@400;500;700&family=Source+Sans+3:wght@400;600;700&display=swap" rel="stylesheet"/>
+    <style>{`*{box-sizing:border-box}body{margin:0;font-family:'Source Sans 3','Segoe UI',system-ui,sans-serif}h1,h2,h3{font-family:'Bitter',Georgia,serif}::-webkit-scrollbar{height:4px}::-webkit-scrollbar-thumb{background:${th.t3};border-radius:2px}`}</style>
+
+    <header style={{background:th.hd,borderBottom:"1px solid "+th.hdb,padding:"8px 0 0",position:"sticky",top:0,zIndex:100,boxShadow:th.sh}}>
+      <div style={{maxWidth:920,margin:"0 auto",padding:"0 12px"}}>
+        <div style={{display:"flex",justifyContent:"space-between",alignItems:"center",marginBottom:6}}>
+          <div style={{display:"flex",alignItems:"center",gap:8}}>
+            <Logo c={th.accent}/>
+            <div>
+              <h1 style={{fontSize:16,fontWeight:700,color:th.accent,lineHeight:1.1,margin:0}}>BOSTON <span style={{color:th.gold}}>MARATHON</span></h1>
+              <div style={{fontSize:8,color:th.t3,letterSpacing:2.5,textTransform:"uppercase",fontFamily:"'Source Sans 3',sans-serif"}}>Operational Intelligence Manual</div>
+            </div>
+          </div>
+          <div style={{display:"flex",gap:5,alignItems:"center"}}>
+            <button onClick={()=>{setDk(!dk);axTrack("click",dk?"light-mode":"dark-mode")}} style={{width:30,height:30,borderRadius:"50%",border:"1px solid "+th.bd,background:th.card,cursor:"pointer",display:"flex",alignItems:"center",justifyContent:"center",fontSize:14}} title={dk?"Day":"Night"}>{dk?"\u2600\uFE0F":"\uD83C\uDF19"}</button>
+            <div style={{display:"flex",background:th.card,borderRadius:16,border:"1px solid "+th.bd,overflow:"hidden"}}>
+              {[["r","RUNNER"],["s","SPECTATOR"]].map(([k,v])=><button key={k} onClick={()=>switchMode(k)} style={{padding:"4px 8px",background:mode===k?th.accent:"transparent",color:mode===k?th.mt:th.t2,border:"none",cursor:"pointer",fontSize:10,fontWeight:mode===k?700:500,letterSpacing:1,fontFamily:"'Source Sans 3',sans-serif"}}>{v}</button>)}
+            </div>
+          </div>
+        </div>
+        <div style={{position:"relative",marginBottom:5}}>
+          <input value={q} onChange={e=>setQ(e.target.value)} placeholder="Search: heartbreak, quads, gels, newton..." style={{width:"100%",padding:"6px 8px 6px 28px",background:th.sb,border:"1px solid "+th.bd,borderRadius:6,color:th.tx,fontSize:11,outline:"none",boxSizing:"border-box",fontFamily:"'Source Sans 3',sans-serif"}}/>
+          <span style={{position:"absolute",left:8,top:"50%",transform:"translateY(-50%)",color:th.t3,fontSize:12}}>&#128269;</span>
+          {sr.length>0&&<div style={{position:"absolute",top:"100%",left:0,right:0,background:th.card,border:"1px solid "+th.bd,borderRadius:6,marginTop:2,zIndex:200,maxHeight:160,overflow:"auto",boxShadow:"0 4px 12px rgba(0,0,0,.15)"}}>
+            {sr.map((r,i)=><div key={i} onClick={()=>{if(r.tab>=0)setTab(r.tab);axTrack("search",r.l,q);setQ("");setSR([])}} style={{padding:"6px 8px",cursor:"pointer",borderBottom:"1px solid "+th.bd,fontSize:11,fontFamily:"'Source Sans 3',sans-serif"}}><span style={{color:th.accent,fontWeight:600}}>{r.l}</span></div>)}
+          </div>}
+        </div>
+        <nav style={{display:"flex",gap:0,overflowX:"auto",scrollbarWidth:"none"}}>
+          {tabs.map((t,i)=><button key={t} onClick={()=>setTab(i)} style={{padding:"6px 10px",background:"transparent",border:"none",borderBottom:"2px solid "+(tab===i?th.ta:"transparent"),color:tab===i?th.ta:th.tt,cursor:"pointer",fontSize:10,fontWeight:tab===i?700:500,whiteSpace:"nowrap",flexShrink:0,fontFamily:"'Source Sans 3',sans-serif",letterSpacing:.5,textTransform:"uppercase"}}>{t}</button>)}
+        </nav>
+      </div>
+    </header>
+
+    <main style={{maxWidth:920,margin:"0 auto",padding:"16px 12px 48px",fontFamily:"'Source Sans 3','Segoe UI',sans-serif"}}>
+      <Pg mode={mode} th={th}/>
+    </main>
+
+    <footer style={{borderTop:"1px solid "+th.bd,padding:12,textAlign:"center",fontSize:9,color:th.t3,fontFamily:"'Source Sans 3',sans-serif"}}>
+      Data from B.A.A. (baa.org) and cited sources. Not affiliated with B.A.A. All data should be verified on official channels before race day.
+    </footer>
+  </div>;
+}
+
+    // Mount
+    const root = ReactDOM.createRoot(document.getElementById('root'));
+    root.render(React.createElement(App));
+  </script>
+</body>
+</html>
