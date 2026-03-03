@@ -204,8 +204,8 @@ const TRAIN = [
 
 const ST=[{t:"6:00 AM",d:"Military March"},{t:"9:06 AM",d:"Men Wheelchair"},{t:"9:09 AM",d:"Women Wheelchair"},{t:"9:30 AM",d:"Handcycles/Duos"},{t:"9:37 AM",d:"Pro Men"},{t:"9:47 AM",d:"Pro Women"},{t:"9:50 AM",d:"Para Athletics"},{t:"10:00 AM",d:"Wave 1"},{t:"10:25 AM",d:"Wave 2"},{t:"10:50 AM",d:"Wave 3"},{t:"11:15 AM",d:"Wave 4"}];
 
-const RTABS=["Course Analysis","Qualification","Logistics","Fuel Strategy","Weather","Training","Failure Modes","Course Map","Sources","Analytics"];
-const SPTABS=["Your Plan","Spot Cards","Itineraries","Course Map","Transit","Reunion","Gear & Rules","Community Tips","Sources","Analytics"];
+const RTABS=["Course Analysis","Qualification","Logistics","Fuel Strategy","Weather","Training","Failure Modes","Course Map","Sources","Analytics","Support & Feedback"];
+const SPTABS=["Your Plan","Spot Cards","Itineraries","Course Map","Transit","Reunion","Gear & Rules","Community Tips","Sources","Analytics","Support & Feedback"];
 
 /* ═══════════════════════════════════════════════════════════════════
    ANALYTICS ENGINE (in-memory, privacy-conscious)
@@ -1128,6 +1128,149 @@ function PAnalytics({th}){
 }
 
 /* ═══════════════════════════════════════════════════════════════════
+   SUPPORT & FEEDBACK
+   ═══════════════════════════════════════════════════════════════════ */
+function PSupportFeedback({th}){
+  const [fs,setFs]=useState("idle");
+  const [name,setName]=useState("");
+  const [email,setEmail]=useState("");
+  const [role,setRole]=useState("");
+  const [fbType,setFbType]=useState("");
+  const [msg,setMsg]=useState("");
+  const [emailErr,setEmailErr]=useState("");
+  const [lastSub,setLastSub]=useState(0);
+
+  // ── CONFIGURATION ──────────────────────────────────────────────
+  // 1. Go to https://formspree.io and create a free account
+  // 2. Create a new form → copy the form ID (e.g. "xpzvqkdl")
+  // 3. Replace the placeholder below with your form ID
+  const FORMSPREE_ID = "YOUR_FORMSPREE_ID";
+  const COFFEE_URL = "https://buymeacoffee.com/debbiesoph";
+
+  const valEmail=(v)=>{
+    if(!v){setEmailErr("");return true}
+    const ok=/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(v);
+    setEmailErr(ok?"":"Invalid email format");
+    return ok;
+  };
+
+  const canSub=msg.trim().length>0&&fs!=="submitting"&&!emailErr;
+
+  const handleSubmit=async(ev)=>{
+    ev.preventDefault();
+    if(!canSub)return;
+    if(!valEmail(email))return;
+    const now=Date.now();
+    if(lastSub>0&&now-lastSub<30000){setFs("ratelimit");return}
+    setFs("submitting");
+    axTrack("feedback","submit",role||"unspecified");
+    try{
+      const res=await fetch("https://formspree.io/f/"+FORMSPREE_ID,{
+        method:"POST",
+        headers:{"Content-Type":"application/json","Accept":"application/json"},
+        body:JSON.stringify({name:name||"Anonymous",email:email||"Not provided",role:role||"Not specified",feedbackType:fbType||"Not specified",message:msg,_gotcha:""})
+      });
+      if(res.ok){
+        setFs("success");setLastSub(Date.now());
+        setName("");setEmail("");setRole("");setFbType("");setMsg("");
+        axTrack("feedback","success",role);
+        // ── ANALYTICS HOOK ──────────────────────────────────────
+        // To add Google Analytics tracking, uncomment and add your GA4 ID:
+        // if(window.gtag) gtag('event','feedback_submit',{role:role,type:fbType});
+        console.log("[Analytics] Feedback submitted:",{role,fbType});
+      }else{setFs("error");axTrack("feedback","error","http_"+res.status)}
+    }catch(err){setFs("error");axTrack("feedback","error","network")}
+  };
+
+  const inp={width:"100%",padding:"8px 10px",background:th.sb,border:"1px solid "+th.bd,borderRadius:6,color:th.tx,fontSize:13,outline:"none",fontFamily:"'Source Sans 3',sans-serif",transition:"border-color .2s"};
+  const lbl={display:"block",fontSize:11,color:th.t2,fontWeight:600,marginBottom:4,textTransform:"uppercase",letterSpacing:.5};
+
+  if(fs==="success")return <div>
+    <Hd t="SUPPORT & FEEDBACK" th={th}/>
+    <Bx hl th={th} ch={<div style={{textAlign:"center",padding:"24px 0"}}>
+      <div style={{width:48,height:48,borderRadius:"50%",background:th.gr+"15",border:"2px solid "+th.gr,display:"inline-flex",alignItems:"center",justifyContent:"center",fontSize:22,marginBottom:12,color:th.gr}}>&#10003;</div>
+      <p style={{fontSize:15,fontWeight:700,color:th.accent,marginBottom:8}}>Thank you.</p>
+      <p style={{fontSize:13,color:th.t2,lineHeight:1.6,maxWidth:400,margin:"0 auto"}}>Your insight makes this guide better for everyone running Boston.</p>
+      <button onClick={()=>setFs("idle")} style={{marginTop:16,padding:"8px 20px",background:th.accent,color:th.mt,border:"none",borderRadius:6,cursor:"pointer",fontSize:12,fontWeight:600,fontFamily:"'Source Sans 3',sans-serif"}}>Send Another</button>
+    </div>}/>
+  </div>;
+
+  return <div>
+    <Hd t="SUPPORT & FEEDBACK" th={th}/>
+
+    <Bx th={th} ch={<div style={{textAlign:"center",padding:"16px 0"}}>
+      <p style={{fontSize:13,color:th.t2,lineHeight:1.6,marginBottom:14,maxWidth:420,margin:"0 auto 14px"}}>If this guide helped you, consider supporting its development.</p>
+      <a href={COFFEE_URL} target="_blank" rel="noopener noreferrer"
+        style={{display:"inline-block",padding:"10px 24px",background:th.bl,color:"#fff",borderRadius:8,fontSize:14,fontWeight:700,textDecoration:"none",transition:"opacity .2s,transform .2s",boxShadow:"0 2px 8px "+th.bl+"33",fontFamily:"'Source Sans 3',sans-serif"}}
+        onMouseEnter={e=>{e.currentTarget.style.opacity="0.88";e.currentTarget.style.transform="translateY(-1px)"}}
+        onMouseLeave={e=>{e.currentTarget.style.opacity="1";e.currentTarget.style.transform="translateY(0)"}}
+        onClick={()=>axTrack("support","coffee_click")}
+      >Buy Me a Coffee</a>
+      <p style={{fontSize:11,color:th.t3,marginTop:10}}>Support is optional. This guide will always remain free.</p>
+    </div>}/>
+
+    <Bx t="Leave Feedback" th={th} ch={<form onSubmit={handleSubmit}>
+      <div style={{display:"none"}} aria-hidden="true">
+        <input type="text" name="_gotcha" tabIndex="-1" autoComplete="off"/>
+      </div>
+
+      <div style={{display:"grid",gridTemplateColumns:"1fr 1fr",gap:10,marginBottom:10}}>
+        <div>
+          <label style={lbl}>Name <span style={{fontWeight:400,color:th.t3}}>(optional)</span></label>
+          <input value={name} onChange={e=>setName(e.target.value)} placeholder="Your name" style={inp}/>
+        </div>
+        <div>
+          <label style={lbl}>Email <span style={{fontWeight:400,color:th.t3}}>(optional)</span></label>
+          <input type="email" value={email} onChange={e=>{setEmail(e.target.value);valEmail(e.target.value)}} placeholder="your@email.com" style={{...inp,borderColor:emailErr?th.rd:th.bd}}/>
+          {emailErr&&<div style={{fontSize:10,color:th.rd,marginTop:2}}>{emailErr}</div>}
+        </div>
+      </div>
+
+      <div style={{display:"grid",gridTemplateColumns:"1fr 1fr",gap:10,marginBottom:10}}>
+        <div>
+          <label style={lbl}>Role</label>
+          <select value={role} onChange={e=>setRole(e.target.value)} style={inp}>
+            <option value="">Select role...</option>
+            <option value="Runner">Runner</option>
+            <option value="Spectator">Spectator</option>
+            <option value="Volunteer">Volunteer</option>
+            <option value="Coach">Coach</option>
+            <option value="Other">Other</option>
+          </select>
+        </div>
+        <div>
+          <label style={lbl}>Feedback Type</label>
+          <select value={fbType} onChange={e=>setFbType(e.target.value)} style={inp}>
+            <option value="">Select type...</option>
+            <option value="Logistics improvement">Logistics improvement</option>
+            <option value="Missing information">Missing information</option>
+            <option value="Error report">Error report</option>
+            <option value="Transit tip">Transit tip</option>
+            <option value="Spectator strategy">Spectator strategy</option>
+            <option value="Runner strategy">Runner strategy</option>
+            <option value="Other">Other</option>
+          </select>
+        </div>
+      </div>
+
+      <div style={{marginBottom:12}}>
+        <label style={lbl}>Message <span style={{color:th.rd}}>*</span></label>
+        <textarea value={msg} onChange={e=>setMsg(e.target.value)} placeholder="Share your insight, correction, or suggestion..." rows={5} style={{...inp,resize:"vertical",minHeight:100,lineHeight:1.6}}/>
+      </div>
+
+      {fs==="error"&&<div style={{background:th.rd+"0a",border:"1px solid "+th.rd+"22",borderRadius:6,padding:8,marginBottom:10,fontSize:12,color:th.rd}}>Something went wrong. Please try again or email directly.</div>}
+      {fs==="ratelimit"&&<div style={{background:th.or+"0a",border:"1px solid "+th.or+"22",borderRadius:6,padding:8,marginBottom:10,fontSize:12,color:th.or}}>Please wait 30 seconds between submissions.</div>}
+
+      <button type="submit" disabled={!canSub} style={{
+        padding:"10px 28px",background:canSub?th.accent:th.bd,color:canSub?th.mt:th.t3,
+        border:"none",borderRadius:6,cursor:canSub?"pointer":"not-allowed",
+        fontSize:13,fontWeight:700,transition:"background .2s",fontFamily:"'Source Sans 3',sans-serif"
+      }}>{fs==="submitting"?"Sending...":"Submit Feedback"}</button>
+    </form>}/>
+  </div>;
+}
+
+/* ═══════════════════════════════════════════════════════════════════
    MAIN APP
    ═══════════════════════════════════════════════════════════════════ */
 function App(){
@@ -1156,8 +1299,8 @@ function App(){
   const idx=useMemo(()=>{const r=[];SEGS.forEach(s=>r.push({t:(s.nm+" "+s.r+" "+s.body.join(" ")).toLowerCase(),tab:0,l:s.nm}));MK.forEach(m=>r.push({t:(m.d+" "+m.l).toLowerCase(),tab:mode==="r"?7:3,l:m.l}));FAIL_MODES.forEach(f=>r.push({t:(f.nm+" "+f.phys).toLowerCase(),tab:6,l:f.nm}));if(mode==="s"){["Copley closed","Woodland","Cleveland Circle","Wellesley","Family Meeting Area","Riverside parking","Back Bay","Arlington station"].forEach(s=>r.push({t:s.toLowerCase(),tab:4,l:s}));}return r},[mode]);
   useEffect(()=>{if(q.length<2){setSR([]);return}setSR(idx.filter(i=>i.t.indexOf(q.toLowerCase())>=0).slice(0,5))},[q,idx]);
 
-  const rPages=[PCourseWar,PQualify,PLogistics,PFuel,PWeather,PTrain,PFail,PMapPage,PSources,PAnalytics];
-  const sPages=[SPlan,SSpots,SItin,PMapPage,STransit,SReunion,SGear,SCommunity,SSources,PAnalytics];
+  const rPages=[PCourseWar,PQualify,PLogistics,PFuel,PWeather,PTrain,PFail,PMapPage,PSources,PAnalytics,PSupportFeedback];
+  const sPages=[SPlan,SSpots,SItin,PMapPage,STransit,SReunion,SGear,SCommunity,SSources,PAnalytics,PSupportFeedback];
   const pages=mode==="r"?rPages:sPages;
   const Pg=pages[tab]||pages[0];
 
