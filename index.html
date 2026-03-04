@@ -204,8 +204,8 @@ const TRAIN = [
 
 const ST=[{t:"6:00 AM",d:"Military March"},{t:"9:06 AM",d:"Men Wheelchair"},{t:"9:09 AM",d:"Women Wheelchair"},{t:"9:30 AM",d:"Handcycles/Duos"},{t:"9:37 AM",d:"Pro Men"},{t:"9:47 AM",d:"Pro Women"},{t:"9:50 AM",d:"Para Athletics"},{t:"10:00 AM",d:"Wave 1"},{t:"10:25 AM",d:"Wave 2"},{t:"10:50 AM",d:"Wave 3"},{t:"11:15 AM",d:"Wave 4"}];
 
-const RTABS=["Course Analysis","Qualification","Logistics","Fuel Strategy","Weather","Training","Failure Modes","Course Map","Sources","Analytics","Support & Feedback"];
-const SPTABS=["Your Plan","Spot Cards","Itineraries","Course Map","Transit","Reunion","Gear & Rules","Community Tips","Sources","Analytics","Support & Feedback"];
+const RTABS=["Course Analysis","Qualification","Logistics","Weather","Training","Failure Modes","Course Map","Sources","Fuel Strategy","Support & Feedback","Analytics"];
+const SPTABS=["Your Plan","Spot Cards","Itineraries","Course Map","Transit","Reunion","Gear & Rules","Community Tips","Sources","Support & Feedback","Analytics"];
 
 /* ═══════════════════════════════════════════════════════════════════
    ANALYTICS ENGINE (in-memory, privacy-conscious)
@@ -1296,11 +1296,11 @@ function App(){
   useScrollTracker(curTabName);
 
   useEffect(()=>{setTab(0)},[mode]);
-  const idx=useMemo(()=>{const r=[];SEGS.forEach(s=>r.push({t:(s.nm+" "+s.r+" "+s.body.join(" ")).toLowerCase(),tab:0,l:s.nm}));MK.forEach(m=>r.push({t:(m.d+" "+m.l).toLowerCase(),tab:mode==="r"?7:3,l:m.l}));FAIL_MODES.forEach(f=>r.push({t:(f.nm+" "+f.phys).toLowerCase(),tab:6,l:f.nm}));if(mode==="s"){["Copley closed","Woodland","Cleveland Circle","Wellesley","Family Meeting Area","Riverside parking","Back Bay","Arlington station"].forEach(s=>r.push({t:s.toLowerCase(),tab:4,l:s}));}return r},[mode]);
+  const idx=useMemo(()=>{const r=[];SEGS.forEach(s=>r.push({t:(s.nm+" "+s.r+" "+s.body.join(" ")).toLowerCase(),tab:0,l:s.nm}));MK.forEach(m=>r.push({t:(m.d+" "+m.l).toLowerCase(),tab:mode==="r"?6:3,l:m.l}));FAIL_MODES.forEach(f=>r.push({t:(f.nm+" "+f.phys).toLowerCase(),tab:5,l:f.nm}));if(mode==="s"){["Copley closed","Woodland","Cleveland Circle","Wellesley","Family Meeting Area","Riverside parking","Back Bay","Arlington station"].forEach(s=>r.push({t:s.toLowerCase(),tab:4,l:s}));}return r},[mode]);
   useEffect(()=>{if(q.length<2){setSR([]);return}setSR(idx.filter(i=>i.t.indexOf(q.toLowerCase())>=0).slice(0,5))},[q,idx]);
 
-  const rPages=[PCourseWar,PQualify,PLogistics,PFuel,PWeather,PTrain,PFail,PMapPage,PSources,PAnalytics,PSupportFeedback];
-  const sPages=[SPlan,SSpots,SItin,PMapPage,STransit,SReunion,SGear,SCommunity,SSources,PAnalytics,PSupportFeedback];
+  const rPages=[PCourseWar,PQualify,PLogistics,PWeather,PTrain,PFail,PMapPage,PSources,PFuel,PSupportFeedback,PAnalytics];
+  const sPages=[SPlan,SSpots,SItin,PMapPage,STransit,SReunion,SGear,SCommunity,SSources,PSupportFeedback,PAnalytics];
   const pages=mode==="r"?rPages:sPages;
   const Pg=pages[tab]||pages[0];
 
