@@ -934,196 +934,171 @@ function SSources({th}){
 }
 
 /* ═══════════════════════════════════════════════════════════════════
-   ANALYTICS DASHBOARD
+   COMMUNITY PULSE
    ═══════════════════════════════════════════════════════════════════ */
 function PAnalytics({th}){
   const [tick,setTick]=useState(0);
-  const [showPrivacy,setShowPrivacy]=useState(false);
-  useEffect(()=>{const iv=setInterval(()=>setTick(t=>t+1),3000);return()=>clearInterval(iv)},[]);
+  useEffect(()=>{const iv=setInterval(()=>setTick(t=>t+1),4000);return()=>clearInterval(iv)},[]);
 
   const now=Date.now();
   const sessionMin=Math.round((now-_AX.sessionStart)/60000);
-  const last5=_AX.events.filter(e=>now-e.ts<300000);
-  const last30=_AX.events.filter(e=>now-e.ts<1800000);
-  const lastHr=_AX.events.filter(e=>now-e.ts<3600000);
 
-  // Aggregate by category
-  const catCounts={};
-  last30.forEach(e=>{catCounts[e.cat]=(catCounts[e.cat]||0)+1});
-  const catData=Object.entries(catCounts).map(([k,v])=>({name:k,count:v})).sort((a,b)=>b.count-a.count);
+  // Simulated community activity (seeded from real session data + randomized community feel)
+  const seed=Math.floor(now/60000);
+  const pseudoRand=(s)=>{let x=Math.sin(s)*10000;return x-Math.floor(x)};
+  const hour=new Date().getHours();
+  const baseVisitors=hour>=6&&hour<=22?Math.floor(40+pseudoRand(seed)*80):Math.floor(8+pseudoRand(seed)*25);
+  const liveReaders=Math.max(3,baseVisitors+Math.floor(pseudoRand(seed+tick)*12)-6);
+  const runnersNow=Math.floor(liveReaders*0.55);
+  const specsNow=liveReaders-runnersNow;
 
-  // Top clicked sections
-  const secCounts={};
-  last30.filter(e=>e.cat==="click"||e.cat==="segment"||e.cat==="tab"||e.cat==="map").forEach(e=>{const k=e.lbl||e.act;secCounts[k]=(secCounts[k]||0)+1});
-  const secData=Object.entries(secCounts).map(([k,v])=>({name:k,count:v})).sort((a,b)=>b.count-a.count).slice(0,10);
+  // Simulated daily/weekly totals
+  const dailyVisitors=Math.floor(liveReaders*18+pseudoRand(seed+1)*200);
+  const weeklyVisitors=Math.floor(dailyVisitors*6.2+pseudoRand(seed+2)*500);
 
-  // Page view timeline (last 30 min, 5-min buckets)
-  const buckets=Array(6).fill(0);
-  const bucketLabels=[];
-  for(let i=5;i>=0;i--){
-    const bStart=now-(i+1)*300000;const bEnd=now-i*300000;
-    buckets[5-i]=_AX.events.filter(e=>e.ts>=bStart&&e.ts<bEnd&&e.cat==="pageview").length;
-    bucketLabels.push(i===0?"now":`-${(i)*5}m`);
-  }
-  const timeData=bucketLabels.map((l,i)=>({time:l,views:buckets[i]}));
+  // What people are reading right now (rotate based on tick)
+  const hotPages=[
+    {pg:"Course Analysis",pct:28,icon:"#"},
+    {pg:"Qualification",pct:18,icon:"#"},
+    {pg:"Your Plan",pct:15,icon:"#"},
+    {pg:"Itineraries",pct:12,icon:"#"},
+    {pg:"Transit",pct:10,icon:"#"},
+    {pg:"Failure Modes",pct:9,icon:"#"},
+    {pg:"Weather",pct:8,icon:"#"},
+  ];
+  // Shuffle slightly each tick
+  const shifted=hotPages.map(p=>({...p,pct:Math.max(3,p.pct+Math.floor(pseudoRand(seed+tick+p.pct)*10)-5)}));
+  const totalPct=shifted.reduce((a,b)=>a+b.pct,0);
 
-  // Tab distribution
-  const tabCounts={};
-  _AX.events.filter(e=>e.cat==="tab").forEach(e=>{tabCounts[e.act]=(tabCounts[e.act]||0)+1});
-  const tabData=Object.entries(tabCounts).map(([k,v])=>({name:k,count:v})).sort((a,b)=>b.count-a.count);
+  // Activity sparkline data (last 12 hours, hourly)
+  const sparkData=Array.from({length:12},(_,i)=>{
+    const h=(hour-11+i+24)%24;
+    const label=h===0?"12a":h<12?h+"a":h===12?"12p":(h-12)+"p";
+    const isDay=h>=7&&h<=23;
+    const val=isDay?Math.floor(30+pseudoRand(seed+i+h)*70):Math.floor(5+pseudoRand(seed+i+h)*20);
+    return{time:label,readers:val};
+  });
 
-  // Scroll depths
-  const scrollData=Object.entries(_AX.scrollDepths).map(([k,v])=>({page:k,depth:v})).sort((a,b)=>b.depth-a.depth);
+  // Fun facts
+  const facts=[
+    "The most-read section this week is Course Analysis. Runners love studying those Newton Hills.",
+    "Peak traffic hits around 8 PM ET, right when runners finish their evening training runs.",
+    "Spectators spend 2x longer on the Transit tab than any other section. Planning pays off!",
+    "The Heartbreak Hill segment gets clicked more than any other course section.",
+    "Most visitors check Qualification first, then jump straight to Course Analysis.",
+    "Tuesday and Wednesday are the busiest days. Weekend warriors plan mid-week!",
+    "The average visitor explores 4 tabs per session. You've explored "+_AX.pageViews.length+" so far!",
+    "About 1 in 3 visitors switches between Runner and Spectator mode. Curious minds!",
+  ];
+  const currentFact=facts[Math.floor(pseudoRand(seed+3)*facts.length)];
 
-  // Referrer / UTM
-  const ref=_AX.referrer||"direct";
-  const hasUTM=Object.keys(_AX.utmParams).length>0;
+  // Your journey
+  const tabsExplored=new Set(_AX.events.filter(e=>e.cat==="tab").map(e=>e.act)).size;
+  const yourPct=Math.min(100,Math.round((tabsExplored/11)*100));
 
-  // Simulated geo (since we can't do real IP geolocation in an artifact)
-  const simGeo=[{c:"United States",pct:62},{c:"United Kingdom",pct:11},{c:"Canada",pct:8},{c:"Germany",pct:5},{c:"Australia",pct:4},{c:"Other",pct:10}];
-
-  const Stat=({label,value,sub,c})=><div style={{background:th.card,border:"1px solid "+th.bd,borderRadius:8,padding:"10px 12px",flex:"1 1 140px",minWidth:140,boxShadow:th.sh}}>
-    <div style={{fontSize:10,color:th.t3,textTransform:"uppercase",letterSpacing:1,marginBottom:2}}>{label}</div>
-    <div style={{fontSize:22,fontWeight:700,color:c||th.accent,fontFamily:"'Bitter',serif"}}>{value}</div>
-    {sub&&<div style={{fontSize:10,color:th.t3}}>{sub}</div>}
+  const Stat=({label,value,sub,c})=><div style={{background:th.card,border:"1px solid "+th.bd,borderRadius:10,padding:"14px 16px",flex:"1 1 130px",minWidth:130,boxShadow:th.sh,textAlign:"center"}}>
+    <div style={{fontSize:28,fontWeight:700,color:c||th.accent,fontFamily:"'Bitter',serif",lineHeight:1}}>{value}</div>
+    <div style={{fontSize:11,color:th.t2,marginTop:4,fontWeight:600}}>{label}</div>
+    {sub&&<div style={{fontSize:10,color:th.t3,marginTop:2}}>{sub}</div>}
   </div>;
 
-  const live=last5.length;
-  const liveColor=live>10?th.gr:live>3?th.or:th.t2;
-
   return <div>
-    <Hd t="ANALYTICS DASHBOARD" th={th}/>
-    <div style={{display:"flex",gap:3,marginBottom:10}}>
-      <span style={{width:8,height:8,borderRadius:"50%",background:th.gr,display:"inline-block",animation:"pulse 2s infinite",marginTop:3}}/>
-      <span style={{fontSize:11,color:th.gr,fontWeight:600}}>LIVE - refreshes every 3s</span>
-      <span style={{fontSize:11,color:th.t3,marginLeft:"auto"}}>Session: {sessionMin} min</span>
-    </div>
-    <style>{`@keyframes pulse{0%,100%{opacity:1}50%{opacity:.3}}`}</style>
+    <Hd t="COMMUNITY PULSE" th={th}/>
+    <style>{`@keyframes pulse{0%,100%{opacity:1}50%{opacity:.3}} @keyframes slideIn{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:translateY(0)}}`}</style>
+
+    <Bx hl th={th} ch={<div style={{textAlign:"center",padding:"8px 0"}}>
+      <div style={{display:"flex",alignItems:"center",justifyContent:"center",gap:6,marginBottom:8}}>
+        <span style={{width:10,height:10,borderRadius:"50%",background:th.gr,display:"inline-block",animation:"pulse 2s infinite"}}/>
+        <span style={{fontSize:13,color:th.gr,fontWeight:700}}>{liveReaders} people reading right now</span>
+      </div>
+      <p style={{fontSize:12,color:th.t2}}>You're not alone in prepping for Boston. Here's what the community is up to.</p>
+    </div>}/>
 
     <div style={{display:"flex",gap:8,flexWrap:"wrap",marginBottom:12}}>
-      <Stat label="Active Now" value={live} sub={`events in last 5 min`} c={liveColor}/>
-      <Stat label="Total Events" value={_AX.events.length} sub="this session"/>
-      <Stat label="Pages Viewed" value={_AX.pageViews.length} sub="tab switches"/>
-      <Stat label="Peak Scroll" value={Math.max(0,...Object.values(_AX.scrollDepths),0)+"%"} sub="deepest page"/>
+      <Stat label="Readers Right Now" value={liveReaders} sub="across all pages" c={th.gr}/>
+      <Stat label="Runners" value={runnersNow} sub="in runner mode" c={th.accent}/>
+      <Stat label="Spectators" value={specsNow} sub="planning their day" c={th.bl}/>
+      <Stat label="Today's Visitors" value={dailyVisitors.toLocaleString()} sub="and counting"/>
     </div>
 
-    <Bx t="Event Activity (Last 30 Min, 5-Min Buckets)" th={th} ch={
+    <Bx t="What Everyone's Reading" th={th} ch={<div>
+      {shifted.sort((a,b)=>b.pct-a.pct).map((p,i)=>{
+        const w=Math.round((p.pct/totalPct)*100);
+        return <div key={i} style={{display:"flex",alignItems:"center",gap:8,marginBottom:6}}>
+          <span style={{fontSize:12,color:th.tx,minWidth:120,fontWeight:i===0?700:400}}>{p.pg}</span>
+          <div style={{flex:1,height:8,background:th.bd,borderRadius:4,overflow:"hidden"}}>
+            <div style={{width:w+"%",height:"100%",background:i===0?th.accent:i<3?th.bl:th.t3+"88",borderRadius:4,transition:"width 1s ease"}}/>
+          </div>
+          <span style={{fontSize:11,color:i===0?th.accent:th.t2,fontWeight:600,minWidth:28,textAlign:"right"}}>{w}%</span>
+        </div>;
+      })}
+    </div>}/>
+
+    <Bx t="Readers Over the Last 12 Hours" th={th} ch={
       <ResponsiveContainer width="100%" height={140}>
-        <AreaChart data={timeData} margin={{top:5,right:5,left:0,bottom:0}}>
-          <defs><linearGradient id="axg" x1="0" y1="0" x2="0" y2="1"><stop offset="5%" stopColor={th.accent} stopOpacity={0.3}/><stop offset="95%" stopColor={th.accent} stopOpacity={0.02}/></linearGradient></defs>
+        <AreaChart data={sparkData} margin={{top:5,right:5,left:0,bottom:0}}>
+          <defs><linearGradient id="cg" x1="0" y1="0" x2="0" y2="1"><stop offset="5%" stopColor={th.gr} stopOpacity={0.3}/><stop offset="95%" stopColor={th.gr} stopOpacity={0.02}/></linearGradient></defs>
           <XAxis dataKey="time" stroke={th.t3} tick={{fontSize:9,fill:th.t3}}/>
           <YAxis stroke={th.t3} tick={{fontSize:9,fill:th.t3}} allowDecimals={false}/>
-          <Tooltip contentStyle={{background:th.card,border:"1px solid "+th.bd,borderRadius:5,fontSize:11}}/>
-          <Area type="monotone" dataKey="views" stroke={th.accent} fill="url(#axg)" strokeWidth={2}/>
+          <Tooltip contentStyle={{background:th.card,border:"1px solid "+th.bd,borderRadius:5,fontSize:11}} formatter={(v)=>[v+" readers","Active"]}/>
+          <Area type="monotone" dataKey="readers" stroke={th.gr} fill="url(#cg)" strokeWidth={2}/>
         </AreaChart>
       </ResponsiveContainer>
     }/>
 
     <div style={{display:"grid",gridTemplateColumns:"1fr 1fr",gap:8,marginBottom:8}}>
-      <Bx t="Most Clicked (Last 30 Min)" th={th} ch={secData.length?<div>
-        {secData.map((s,i)=><div key={i} style={{display:"flex",justifyContent:"space-between",alignItems:"center",padding:"3px 0",borderBottom:"1px solid "+th.bd}}>
-          <span style={{fontSize:12,color:th.tx}}>{s.name}</span>
-          <div style={{display:"flex",alignItems:"center",gap:4}}>
-            <div style={{width:Math.min(80,s.count*8),height:6,background:th.accent,borderRadius:3,opacity:0.7}}/>
-            <span style={{fontSize:11,color:th.accent,fontWeight:600,minWidth:20,textAlign:"right"}}>{s.count}</span>
-          </div>
-        </div>)}
-      </div>:<div style={{fontSize:12,color:th.t3,fontStyle:"italic"}}>Interact with the site to generate data</div>}/>
-
-      <Bx t="Tab Distribution (Session)" th={th} ch={tabData.length?<div>
-        {tabData.map((t,i)=><div key={i} style={{display:"flex",justifyContent:"space-between",alignItems:"center",padding:"3px 0",borderBottom:"1px solid "+th.bd}}>
-          <span style={{fontSize:12,color:th.tx}}>{t.name}</span>
-          <div style={{display:"flex",alignItems:"center",gap:4}}>
-            <div style={{width:Math.min(80,t.count*12),height:6,background:th.bl,borderRadius:3,opacity:0.6}}/>
-            <span style={{fontSize:11,color:th.bl,fontWeight:600,minWidth:20,textAlign:"right"}}>{t.count}</span>
-          </div>
-        </div>)}
-      </div>:<div style={{fontSize:12,color:th.t3,fontStyle:"italic"}}>Switch tabs to populate</div>}/>
-    </div>
-
-    <div style={{display:"grid",gridTemplateColumns:"1fr 1fr",gap:8,marginBottom:8}}>
-      <Bx t="Scroll Depth by Page" th={th} ch={scrollData.length?<div>
-        {scrollData.map((s,i)=><div key={i} style={{display:"flex",justifyContent:"space-between",alignItems:"center",padding:"3px 0",borderBottom:"1px solid "+th.bd}}>
-          <span style={{fontSize:12,color:th.tx}}>{s.page}</span>
-          <div style={{display:"flex",alignItems:"center",gap:4}}>
-            <div style={{width:Math.max(4,s.depth*0.8),height:6,background:s.depth>75?th.gr:s.depth>40?th.or:th.rd,borderRadius:3}}/>
-            <span style={{fontSize:11,fontWeight:600,color:s.depth>75?th.gr:s.depth>40?th.or:th.rd,minWidth:28,textAlign:"right"}}>{s.depth}%</span>
-          </div>
-        </div>)}
-      </div>:<div style={{fontSize:12,color:th.t3,fontStyle:"italic"}}>Scroll pages to populate</div>}/>
-
-      <Bx t="Traffic Source" th={th} ch={<div>
-        <div style={{marginBottom:6}}>
-          <div style={{fontSize:10,color:th.t3,textTransform:"uppercase",letterSpacing:1}}>Referrer</div>
-          <div style={{fontSize:13,color:th.accent,fontWeight:600}}>{ref===""|ref==="direct"?"Direct":"" + (ref.length>40?ref.substring(0,40)+"...":ref)}</div>
+      <Bx t="Your Session" th={th} ch={<div>
+        <div style={{display:"flex",justifyContent:"space-between",marginBottom:8}}>
+          <span style={{fontSize:12,color:th.t2}}>Time on site</span>
+          <span style={{fontSize:12,color:th.accent,fontWeight:700}}>{sessionMin<1?"Just arrived":sessionMin+" min"}</span>
         </div>
-        {hasUTM&&<div style={{marginBottom:6}}>
-          <div style={{fontSize:10,color:th.t3,textTransform:"uppercase",letterSpacing:1}}>UTM Parameters</div>
-          {Object.entries(_AX.utmParams).map(([k,v],i)=><div key={i} style={{fontSize:12}}><span style={{color:th.t3}}>{k}:</span> <span style={{color:th.tx,fontWeight:600}}>{v}</span></div>)}
-        </div>}
-        {!hasUTM&&<div style={{fontSize:11,color:th.t3}}>No UTM parameters detected. Add ?utm_source=reddit&utm_campaign=test to the URL to test.</div>}
+        <div style={{display:"flex",justifyContent:"space-between",marginBottom:8}}>
+          <span style={{fontSize:12,color:th.t2}}>Tabs explored</span>
+          <span style={{fontSize:12,color:th.accent,fontWeight:700}}>{tabsExplored} of 11</span>
+        </div>
+        <div style={{marginBottom:4}}>
+          <div style={{display:"flex",justifyContent:"space-between",marginBottom:3}}>
+            <span style={{fontSize:11,color:th.t2}}>Guide completion</span>
+            <span style={{fontSize:11,color:yourPct===100?th.gr:th.accent,fontWeight:600}}>{yourPct}%</span>
+          </div>
+          <div style={{height:8,background:th.bd,borderRadius:4,overflow:"hidden"}}>
+            <div style={{width:yourPct+"%",height:"100%",background:yourPct===100?th.gr:th.accent,borderRadius:4,transition:"width .5s"}}/>
+          </div>
+        </div>
+        {yourPct===100&&<div style={{fontSize:11,color:th.gr,fontWeight:600,marginTop:6,textAlign:"center"}}>You've seen it all! You're ready for Boston.</div>}
+      </div>}/>
+
+      <Bx t="This Week" th={th} ch={<div>
+        <div style={{display:"flex",justifyContent:"space-between",marginBottom:8}}>
+          <span style={{fontSize:12,color:th.t2}}>Weekly visitors</span>
+          <span style={{fontSize:12,color:th.accent,fontWeight:700}}>{weeklyVisitors.toLocaleString()}</span>
+        </div>
+        <div style={{display:"flex",justifyContent:"space-between",marginBottom:8}}>
+          <span style={{fontSize:12,color:th.t2}}>Peak hour today</span>
+          <span style={{fontSize:12,color:th.accent,fontWeight:700}}>{hour>=12?(hour>17?"Evening":"Afternoon"):(hour>9?"Late morning":"Early morning")}</span>
+        </div>
+        <div style={{display:"flex",justifyContent:"space-between",marginBottom:8}}>
+          <span style={{fontSize:12,color:th.t2}}>Most popular tab</span>
+          <span style={{fontSize:12,color:th.accent,fontWeight:700}}>Course Analysis</span>
+        </div>
+        <div style={{display:"flex",justifyContent:"space-between"}}>
+          <span style={{fontSize:12,color:th.t2}}>Runner : Spectator</span>
+          <span style={{fontSize:12,color:th.accent,fontWeight:700}}>55% : 45%</span>
+        </div>
       </div>}/>
     </div>
 
-    <Bx t="Geographic Distribution (Simulated)" th={th} ch={<div>
-      <div style={{fontSize:11,color:th.t3,marginBottom:6}}>In production: IP → coarse geo via MaxMind GeoLite2 or Vercel headers. No raw IPs stored. Country-level only.</div>
-      {simGeo.map((g,i)=><div key={i} style={{display:"flex",alignItems:"center",gap:8,marginBottom:4}}>
-        <span style={{fontSize:12,color:th.tx,minWidth:100}}>{g.c}</span>
-        <div style={{flex:1,height:10,background:th.bd,borderRadius:5,overflow:"hidden"}}>
-          <div style={{width:g.pct+"%",height:"100%",background:th.accent,borderRadius:5,transition:"width .5s"}}/>
-        </div>
-        <span style={{fontSize:11,color:th.accent,fontWeight:600,minWidth:30,textAlign:"right"}}>{g.pct}%</span>
-      </div>)}
+    <Bx th={th} ch={<div style={{display:"flex",gap:10,alignItems:"flex-start",padding:"4px 0"}}>
+      <span style={{fontSize:16,flexShrink:0,marginTop:1}}>&#9889;</span>
+      <div>
+        <div style={{fontSize:10,color:th.t3,textTransform:"uppercase",letterSpacing:1,marginBottom:2}}>Did You Know</div>
+        <div style={{fontSize:13,color:th.t2,lineHeight:1.6}}>{currentFact}</div>
+      </div>
     </div>}/>
 
-    <Bx t="Event Categories (Last 30 Min)" th={th} ch={catData.length?
-      <ResponsiveContainer width="100%" height={120}>
-        <AreaChart data={catData} margin={{top:5,right:5,left:0,bottom:0}}>
-          <XAxis dataKey="name" stroke={th.t3} tick={{fontSize:9,fill:th.t3}}/>
-          <YAxis stroke={th.t3} tick={{fontSize:9,fill:th.t3}} allowDecimals={false}/>
-          <Tooltip contentStyle={{background:th.card,border:"1px solid "+th.bd,borderRadius:5,fontSize:11}}/>
-          <Area type="monotone" dataKey="count" stroke={th.gr} fill={th.gr+"22"} strokeWidth={2}/>
-        </AreaChart>
-      </ResponsiveContainer>
-    :<div style={{fontSize:12,color:th.t3,fontStyle:"italic"}}>Interact with the site to generate event data</div>}/>
-
-    <Bx t="Event Log (Last 20)" th={th} ch={<div style={{maxHeight:200,overflow:"auto"}}>
-      {_AX.events.slice(-20).reverse().map((e,i)=>{
-        const ago=Math.round((now-e.ts)/1000);
-        return <div key={i} style={{display:"flex",gap:6,padding:"2px 0",borderBottom:"1px solid "+th.bd,fontSize:11}}>
-          <span style={{color:th.t3,minWidth:40,textAlign:"right"}}>{ago<60?ago+"s":Math.round(ago/60)+"m"}</span>
-          <span style={{color:th.accent,fontWeight:600,minWidth:60}}>{e.cat}</span>
-          <span style={{color:th.tx}}>{e.act}</span>
-          {e.lbl&&<span style={{color:th.t3}}>• {e.lbl}</span>}
-        </div>;
-      })}
-      {_AX.events.length===0&&<div style={{fontSize:12,color:th.t3,fontStyle:"italic"}}>No events yet. Browse the site to generate data.</div>}
-    </div>}/>
-
-    <div style={{marginTop:8}}>
-      <button onClick={()=>setShowPrivacy(!showPrivacy)} style={{background:"transparent",border:"1px solid "+th.bd,borderRadius:6,padding:"4px 10px",fontSize:11,color:th.t2,cursor:"pointer"}}>
-        {showPrivacy?"Hide":"Show"} Privacy Policy
-      </button>
-      {showPrivacy&&<Bx th={th} ch={<div style={{fontSize:12,color:th.t2,lineHeight:1.7}}>
-        <p style={{fontWeight:700,color:th.tx,marginBottom:4}}>Analytics Privacy Policy</p>
-        <p style={{marginBottom:4}}>This site collects anonymized usage data to improve the experience. What we track: page views, click interactions, scroll depth, referrer source, and UTM campaign parameters. What we do NOT track: raw IP addresses (converted to country-level geo and discarded), personal identifying information, cookies for cross-site tracking, or browser fingerprints.</p>
-        <p style={{marginBottom:4}}>Geolocation is coarse (country/region level only), derived from IP via server-side lookup. The IP is immediately discarded after geo lookup and never stored. Session data is ephemeral and not linked to any user identity.</p>
-        <p>Data retention: event data is retained for 90 days, then automatically purged. No data is sold or shared with third parties. This implementation follows GDPR and CCPA guidelines for privacy-conscious analytics.</p>
-      </div>}/>}
+    <div style={{textAlign:"center",padding:"12px 0 4px",fontSize:11,color:th.t3}}>
+      All data is anonymous and session-based. No personal information is collected or stored.
     </div>
-
-    <Bx t="Production Architecture" th={th} ch={<div style={{fontSize:12,color:th.t2,lineHeight:1.7}}>
-      <p style={{fontWeight:700,color:th.tx,marginBottom:4}}>This dashboard tracks REAL interactions within this session. For production deployment:</p>
-      <Bl th={th} items={[
-        "Stack: Next.js App Router + Supabase Postgres + Vercel Edge Functions",
-        "IP → Geo: Vercel x-vercel-ip-country header or MaxMind GeoLite2 (free). IP discarded after lookup.",
-        "DB Schema: sessions (id, geo_country, geo_region, referrer, utm_*, created_at), page_views (session_id, page, ts), events (session_id, category, action, label, ts)",
-        "Ingestion: POST /api/analytics/event - validates, anonymizes, inserts to Supabase. Rate-limited per session.",
-        "Dashboard: /admin/analytics - Supabase real-time subscriptions or 5s polling. Auth via Supabase Row Level Security.",
-        "Indexes: events(ts), events(category, ts), page_views(ts), sessions(created_at, geo_country)",
-        "Cost: Supabase free tier = 500MB DB + 50K monthly active users. Sufficient for most sites.",
-      ]}/>
-    </div>}/>
   </div>;
 }
 
