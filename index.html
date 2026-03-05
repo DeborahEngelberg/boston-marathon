@@ -204,8 +204,8 @@ const TRAIN = [
 
 const ST=[{t:"6:00 AM",d:"Military March"},{t:"9:06 AM",d:"Men Wheelchair"},{t:"9:09 AM",d:"Women Wheelchair"},{t:"9:30 AM",d:"Handcycles/Duos"},{t:"9:37 AM",d:"Pro Men"},{t:"9:47 AM",d:"Pro Women"},{t:"9:50 AM",d:"Para Athletics"},{t:"10:00 AM",d:"Wave 1"},{t:"10:25 AM",d:"Wave 2"},{t:"10:50 AM",d:"Wave 3"},{t:"11:15 AM",d:"Wave 4"}];
 
-const RTABS=["Course Analysis","Qualification","Logistics","Weather","Training","Failure Modes","Course Map","Sources","Fuel Strategy","Support & Feedback","Analytics"];
-const SPTABS=["Your Plan","Spot Cards","Itineraries","Course Map","Transit","Reunion","Gear & Rules","Community Tips","Sources","Support & Feedback","Analytics"];
+const RTABS=["Course Analysis","Qualification","Logistics","Weather","Training","Failure Modes","Course Map","Fuel Strategy","Support & Feedback","Analytics","Sources"];
+const SPTABS=["Your Plan","Spot Cards","Itineraries","Course Map","Transit","Reunion","Gear & Rules","Community Tips","Support & Feedback","Analytics","Sources"];
 
 /* ═══════════════════════════════════════════════════════════════════
    ANALYTICS ENGINE (in-memory, privacy-conscious)
@@ -953,8 +953,8 @@ function PAnalytics({th}){
   const specsNow=liveReaders-runnersNow;
 
   // Simulated daily/weekly totals
-  const dailyVisitors=Math.floor(liveReaders*18+pseudoRand(seed+1)*200);
-  const weeklyVisitors=Math.floor(dailyVisitors*6.2+pseudoRand(seed+2)*500);
+  const dailyVisitors=Math.floor(800+pseudoRand(seed+1)*1200);
+  const weeklyVisitors=Math.floor(dailyVisitors*5.8+pseudoRand(seed+2)*800);
 
   // What people are reading right now (rotate based on tick)
   const hotPages=[
@@ -1252,8 +1252,6 @@ function App(){
   const [dk,setDk]=useState(false);
   const [mode,setMode]=useState("r");
   const [tab,setTab]=useState(0);
-  const [q,setQ]=useState("");
-  const [sr,setSR]=useState([]);
   const th=dk?D_TH:L_TH;
   const tabs=mode==="r"?RTABS:SPTABS;
 
@@ -1271,11 +1269,9 @@ function App(){
   useScrollTracker(curTabName);
 
   useEffect(()=>{setTab(0)},[mode]);
-  const idx=useMemo(()=>{const r=[];SEGS.forEach(s=>r.push({t:(s.nm+" "+s.r+" "+s.body.join(" ")).toLowerCase(),tab:0,l:s.nm}));MK.forEach(m=>r.push({t:(m.d+" "+m.l).toLowerCase(),tab:mode==="r"?6:3,l:m.l}));FAIL_MODES.forEach(f=>r.push({t:(f.nm+" "+f.phys).toLowerCase(),tab:5,l:f.nm}));if(mode==="s"){["Copley closed","Woodland","Cleveland Circle","Wellesley","Family Meeting Area","Riverside parking","Back Bay","Arlington station"].forEach(s=>r.push({t:s.toLowerCase(),tab:4,l:s}));}return r},[mode]);
-  useEffect(()=>{if(q.length<2){setSR([]);return}setSR(idx.filter(i=>i.t.indexOf(q.toLowerCase())>=0).slice(0,5))},[q,idx]);
 
-  const rPages=[PCourseWar,PQualify,PLogistics,PWeather,PTrain,PFail,PMapPage,PSources,PFuel,PSupportFeedback,PAnalytics];
-  const sPages=[SPlan,SSpots,SItin,PMapPage,STransit,SReunion,SGear,SCommunity,SSources,PSupportFeedback,PAnalytics];
+  const rPages=[PCourseWar,PQualify,PLogistics,PWeather,PTrain,PFail,PMapPage,PFuel,PSupportFeedback,PAnalytics,PSources];
+  const sPages=[SPlan,SSpots,SItin,PMapPage,STransit,SReunion,SGear,SCommunity,PSupportFeedback,PAnalytics,SSources];
   const pages=mode==="r"?rPages:sPages;
   const Pg=pages[tab]||pages[0];
 
@@ -1299,13 +1295,6 @@ function App(){
               {[["r","RUNNER"],["s","SPECTATOR"]].map(([k,v])=><button key={k} onClick={()=>switchMode(k)} style={{padding:"4px 8px",background:mode===k?th.accent:"transparent",color:mode===k?th.mt:th.t2,border:"none",cursor:"pointer",fontSize:10,fontWeight:mode===k?700:500,letterSpacing:1,fontFamily:"'Source Sans 3',sans-serif"}}>{v}</button>)}
             </div>
           </div>
-        </div>
-        <div style={{position:"relative",marginBottom:5}}>
-          <input value={q} onChange={e=>setQ(e.target.value)} placeholder="Search: heartbreak, quads, gels, newton..." style={{width:"100%",padding:"6px 8px 6px 28px",background:th.sb,border:"1px solid "+th.bd,borderRadius:6,color:th.tx,fontSize:11,outline:"none",boxSizing:"border-box",fontFamily:"'Source Sans 3',sans-serif"}}/>
-          <span style={{position:"absolute",left:8,top:"50%",transform:"translateY(-50%)",color:th.t3,fontSize:12}}>&#128269;</span>
-          {sr.length>0&&<div style={{position:"absolute",top:"100%",left:0,right:0,background:th.card,border:"1px solid "+th.bd,borderRadius:6,marginTop:2,zIndex:200,maxHeight:160,overflow:"auto",boxShadow:"0 4px 12px rgba(0,0,0,.15)"}}>
-            {sr.map((r,i)=><div key={i} onClick={()=>{if(r.tab>=0)setTab(r.tab);axTrack("search",r.l,q);setQ("");setSR([])}} style={{padding:"6px 8px",cursor:"pointer",borderBottom:"1px solid "+th.bd,fontSize:11,fontFamily:"'Source Sans 3',sans-serif"}}><span style={{color:th.accent,fontWeight:600}}>{r.l}</span></div>)}
-          </div>}
         </div>
         <nav style={{display:"flex",gap:0,overflowX:"auto",scrollbarWidth:"none"}}>
           {tabs.map((t,i)=><button key={t} onClick={()=>setTab(i)} style={{padding:"6px 10px",background:"transparent",border:"none",borderBottom:"2px solid "+(tab===i?th.ta:"transparent"),color:tab===i?th.ta:th.tt,cursor:"pointer",fontSize:10,fontWeight:tab===i?700:500,whiteSpace:"nowrap",flexShrink:0,fontFamily:"'Source Sans 3',sans-serif",letterSpacing:.5,textTransform:"uppercase"}}>{t}</button>)}
