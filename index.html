@@ -60,7 +60,7 @@ const EL=[{m:0,e:490,t:"Hopkinton",s:"s"},{m:1,e:360,t:"Hopkinton",s:"d"},{m:2,e
 
 const CC=[[42.2293,-71.5218],[42.2352,-71.5098],[42.2421,-71.487],[42.2488,-71.4635],[42.2553,-71.442],[42.257,-71.4218],[42.259,-71.398],[42.262,-71.375],[42.268,-71.352],[42.272,-71.331],[42.28,-71.31],[42.288,-71.289],[42.293,-71.268],[42.296,-71.25],[42.301,-71.231],[42.306,-71.215],[42.319,-71.205],[42.331,-71.197],[42.338,-71.187],[42.34,-71.173],[42.342,-71.159],[42.34,-71.147],[42.345,-71.133],[42.347,-71.118],[42.349,-71.101],[42.35,-71.088],[42.3498,-71.076],[42.3496,-71.0773],[42.3491,-71.0775]];
 
-const MK=[{m:0,la:42.2293,lo:-71.5218,l:"START",d:"490 ft. Point of no return."},{m:4,la:42.2553,lo:-71.442,l:"M4",d:"180 ft. 310 ft dropped. Quad damage accumulating."},{m:8,la:42.268,lo:-71.352,l:"M8",d:"Natick. False-flat rollers."},{m:12,la:42.293,lo:-71.268,l:"M12",d:"Scream Tunnel. Control the adrenaline."},{m:13.1,la:42.296,lo:-71.25,l:"HALF",d:"Halfway. You are NOT half done."},{m:16,la:42.319,lo:-71.205,l:"M16",d:"60 ft. Lowest. Newton begins NOW."},{m:17,la:42.331,lo:-71.197,l:"M17",d:"Hill 1. Gel depot 2."},{m:20,la:42.342,lo:-71.159,l:"M20",d:"Hill 3 summit. Heartbreak next."},{m:20.5,la:42.341,lo:-71.153,l:"HB",d:"Heartbreak. 0.4 mi, +88 ft, 4% grade."},{m:21,la:42.34,lo:-71.147,l:"M21",d:"Summit 230 ft. All downhill to glory."},{m:25,la:42.35,lo:-71.088,l:"M25",d:"Citgo sign. 1.2 mi. Do not stop."},{m:26.2,la:42.3491,lo:-71.0775,l:"FIN",d:"Boylston St. 10 ft. Done."}];
+const MK=[{m:0,la:42.2293,lo:-71.5218,l:"START",d:"490 ft. The journey begins."},{m:4,la:42.2553,lo:-71.442,l:"M4",d:"180 ft. 310 ft of descent complete. Settling into race rhythm."},{m:8,la:42.268,lo:-71.352,l:"M8",d:"Natick. False-flat rollers."},{m:12,la:42.293,lo:-71.268,l:"M12",d:"Scream Tunnel. Soak in the energy."},{m:13.1,la:42.296,lo:-71.25,l:"HALF",d:"Halfway. Strong work — the best miles are ahead."},{m:16,la:42.319,lo:-71.205,l:"M16",d:"60 ft. Course low point. Time to climb — you've got this."},{m:17,la:42.331,lo:-71.197,l:"M17",d:"Hill 1. Gel depot 2."},{m:20,la:42.342,lo:-71.159,l:"M20",d:"Hill 3 summit. Heartbreak next."},{m:20.5,la:42.341,lo:-71.153,l:"HB",d:"Heartbreak. 0.4 mi, +88 ft, 4% grade."},{m:21,la:42.34,lo:-71.147,l:"M21",d:"Summit 230 ft. You've conquered the hills. Downhill to Boston."},{m:25,la:42.35,lo:-71.088,l:"M25",d:"Citgo sign. 1.2 mi to go. Almost there."},{m:26.2,la:42.3491,lo:-71.0775,l:"FIN",d:"Boylston St. 10 ft. Done."}];
 
 const SP=[{n:"Scream Tunnel",la:42.294,lo:-71.26,t:"M12. Wellesley College. 100+ dB. Runners accelerate 5-10 sec/mi involuntarily here.",tr:"Wellesley Commuter Rail"},{n:"Heartbreak Hill",la:42.341,lo:-71.153,t:"M20-21. Where races are decided. BC campus.",tr:"Green B to BC"},{n:"Coolidge Corner",la:42.347,lo:-71.118,t:"M23. Brookline. Less packed. Good restaurants for waiting.",tr:"Green C"},{n:"Kenmore/Citgo",la:42.3488,lo:-71.0972,t:"M25. The Citgo sign. Emotional. Massive crowds.",tr:"Green to Kenmore"},{n:"Finish",la:42.3491,lo:-71.0775,t:"Security checkpoints. ADA viewing at Hereford/Boylston.",tr:"Orange to Back Bay"}];
 
@@ -74,12 +74,12 @@ const SEGS = [
   {id:"d",r:"Start to Mile 4",nm:"The Trap",el:"-310 ft (490→180)",
    grade:"Avg 3% down. Mile 1: 7.5% max grade. Steepest sustained descent of any World Major.",
    body:[
-    "This is where Boston races are lost. Not won. Lost. The 310-ft plunge in 4 miles creates an eccentric contraction load on your quadriceps that you will not feel until mile 17. By then it is too late.",
+    "This is where smart Boston races are built. The 310-ft plunge in 4 miles creates an eccentric contraction load on your quadriceps that you won't feel until mile 17. Runners who respect this section set themselves up for a strong Newton.",
     "The physiology: downhill running forces your quads to brake against gravity. Each stride produces micro-tears in muscle fibers via eccentric (lengthening) contractions. Research from Eston et al. shows eccentric damage peaks 48-72 hours post-effort, but at Boston, you only have 12-17 more miles before those damaged quads must climb Newton.",
     "GPS pace is lying to you here. Your watch says 6:30/mi but your effort is 7:15. Trust your heart rate or perceived effort, never your watch, for the first 4 miles. Cap HR at 75% of max through mile 4.",
-    "The crowd at the start is deafening. Adrenaline is at its peak. The road is literally tilting you forward. Every instinct says GO. Every instinct is wrong.",
+    "The crowd at the start is electric. Adrenaline is at its peak. The road is literally tilting you forward. Every instinct says GO — but patience here is what separates great Boston races from good ones.",
    ],
-   mistakes:["Running pace instead of effort","Letting gravity set tempo","Ignoring HR data","Banking time (you are borrowing from Newton)"],
+   mistakes:["Running pace instead of effort","Letting gravity set tempo","Ignoring HR data","Trying to bank time (save it for Newton instead)"],
    pacing:{s3:"7:00-7:10/mi (feels painfully slow)",s35:"8:10-8:20/mi",bq:"10-15 sec/mi SLOWER than goal pace"},
    src:"B.A.A.; V.O2/Dr. Jack Daniels; Eston et al. MSSE 1995"},
   {id:"r",r:"Miles 5-8",nm:"The False Flats",el:"Rolling (+/- 25 ft per mile)",
@@ -87,7 +87,7 @@ const SEGS = [
    body:[
     "Through Ashland and Framingham. Rolling terrain that feels flat but is not. These are false flats: subtle grades that mask effort. Your pace will look perfect. That is the trap.",
     "This section is where you build the foundation for Newton. The goal is metabolic banking: run at a sustainable effort so your glycogen stores arrive at mile 16 with reserves. Burn too much here and Newton is a sufferfest.",
-    "Crowd support is moderate. Framingham center has a decent crowd. You will pass through residential neighborhoods. This section tests mental patience more than physical ability.",
+    "Crowd support is moderate. Framingham center has a decent crowd. You will pass through residential neighborhoods. This section is about finding your rhythm and settling in for the journey ahead.",
    ],
    mistakes:["Increasing pace because it feels easy","Under-fueling (start eating by mile 5)","Ignoring mild quad tightness"],
    pacing:{s3:"6:48-6:52/mi (goal pace, lock in)",s35:"7:58-8:02/mi",bq:"Goal pace, steady"},
@@ -96,9 +96,9 @@ const SEGS = [
    grade:"Gentle descent through Natick into Wellesley. 0.5% average down.",
    body:[
     "Natick to Wellesley. Increasingly flat. Near mile 12, Wellesley College students create the Scream Tunnel, a half-mile corridor of sustained 100+ dB cheering. It is one of the most intense spectator experiences in world running.",
-    "Measured effect: race reports and split analyses show runners commonly accelerate 5-10 seconds per mile through the Scream Tunnel involuntarily. This is free speed you cannot afford. Control it or pay later.",
+    "Measured effect: race reports and split analyses show runners commonly accelerate 5-10 seconds per mile through the Scream Tunnel involuntarily. Enjoy the energy, but stay disciplined — the real race is still ahead.",
     "Maurten Gel Depot 1 at mile 11.8. Take it. If you miss it, your next chance is mile 17.",
-    "Halfway at mile 13.1. Critical mental checkpoint: you are NOT half done. You are maybe 40% done in terms of physiological cost. The second half of Boston, because of Newton, costs roughly 60% of your total energy. Reframe: the race starts at mile 16.",
+    "Halfway at mile 13.1. Important mental checkpoint: the second half of Boston, because of Newton, demands roughly 60% of your total energy. You've done great work getting here — now shift your focus. The most rewarding miles start at 16.",
    ],
    mistakes:["Accelerating through Scream Tunnel","Thinking halfway means halfway","Skipping gel at 11.8","Feeling good and pushing pace"],
    pacing:{s3:"6:48-6:52/mi (hold steady)",s35:"7:58-8:02/mi",bq:"Do not go faster than goal"},
@@ -108,7 +108,7 @@ const SEGS = [
    body:[
     "Wellesley Hills down toward Newton Lower Falls. The drop from mile 15 to 16 is the second significant downhill section. More eccentric damage on quads that have already absorbed 310 ft of braking from the first 4 miles.",
     "You reach the course low point at mile 16: 60 ft above sea level. You have fallen 430 vertical feet from the start. Your quads have done the work of a vertical descent greater than the height of the Statue of Liberty.",
-    "At mile 16 exactly, Newton begins. There is no transition. No warm-up hill. The road tilts up and does not meaningfully stop until mile 21. Everything before mile 16 was prologue.",
+    "At mile 16 exactly, Newton begins. The road tilts up and doesn't meaningfully stop until mile 21. This is what you trained for — everything before mile 16 was preparation for this stretch.",
    ],
    mistakes:["Hammering the downhill at mile 15-16","Not eating at mile 14-15 for Newton","Mental complacency"],
    pacing:{s3:"6:50-6:55/mi (allow slight slowdown)",s35:"8:00-8:05/mi",bq:"Accept 5-10 sec/mi slow on the climbs"},
@@ -116,61 +116,61 @@ const SEGS = [
   {id:"n",r:"Miles 16-21",nm:"Newton Hills (The Four Hills)",el:"+170 ft total (60→230)",
    grade:"Hill 1 (M16-17): +55 ft, 1.7% avg, Rte 128 overpass. Hill 2 (M17-18): +30 ft, 1.3%, firehouse turn to Comm Ave. Hill 3 (M19-20): +20 ft, 1.0%, past Newton City Hall. Hill 4 / Heartbreak (M20-21): +88 ft, 4.0% peak grade, half-mile sustained climb.",
    body:[
-    "Five miles. Four hills. 170 vertical feet of climbing. This is where the Boston Marathon is decided. Not because the hills are objectively hard: 170 ft over 5 miles is a 0.65% average grade. A cyclist would not notice it. But you are not cycling at mile 16 of a marathon with 430 ft of eccentric quad damage already banked.",
-    "The first Newton hill (Rte 128 overpass) hits at mile 16 with no warning. Your HR will spike 10-15 bpm within 30 seconds. This is the moment where under-trained quads announce themselves. The micro-tears from the early downhill now produce pain, stiffness, and power loss on every uphill stride.",
+    "Five miles. Four hills. 170 vertical feet of climbing. This is the signature stretch of Boston — the miles that make finishing this race so meaningful. The hills aren't objectively steep: 170 ft over 5 miles is a 0.65% average grade. But at mile 16 of a marathon with significant eccentric work already done, they demand respect and smart racing.",
+    "The first Newton hill (Rte 128 overpass) arrives at mile 16. Your HR will spike 10-15 bpm within 30 seconds. This is where your quad conditioning pays off. The micro-tears from the early downhill now produce pain, stiffness, and power loss on every uphill stride.",
     "Hill 2 at the firehouse turn: you make a right onto Commonwealth Ave. The crowds build. The road rises 30 ft. This is manageable if you are patient.",
-    "Hill 3 past Newton City Hall: only +20 ft but you are at mile 19-20 now. Glycogen is depleting. If you have not fueled properly, you will feel the wall forming.",
-    "Hill 4: HEARTBREAK HILL. Mile 20 to 20.5. Half a mile. 88 vertical feet. 4% peak grade. It is NOT the steepest hill on the course. Hill 1 is steeper on a sustained basis. But Heartbreak is decisive because of when it arrives: mile 20, with depleted glycogen, damaged quads, and 2+ hours of accumulated fatigue.",
-    "The name comes from a 1936 race where Johnny Kelley caught leader Ellison Tarzan Brown on this hill, tapped his shoulder in passing, and Brown surged away to win. Kelley's heart was said to have broken. Yours might too.",
+    "Hill 3 past Newton City Hall: only +20 ft but you're at mile 19-20 now. Glycogen is depleting. Proper fueling earlier in the race pays dividends here.",
+    "Hill 4: HEARTBREAK HILL. Mile 20 to 20.5. Half a mile. 88 vertical feet. 4% peak grade. It's actually not the steepest hill on the course — Hill 1 is steeper on a sustained basis. But Heartbreak is the defining moment because of when it arrives: mile 20, with depleted glycogen, tired quads, and 2+ hours of effort behind you. Cresting Heartbreak is one of the most rewarding moments in marathon running.",
+    "The name comes from a 1936 race where Johnny Kelley caught leader Ellison Tarzan Brown on this hill, tapped his shoulder in passing, and Brown surged away to win. Kelley's heart was said to have broken. Yours won't — because you'll be ready.",
     "Gel Depot 2 at mile 17. Gel Depot 3 at mile 21.5 (just past the summit). Take BOTH. You need carbohydrates for the final 5 miles.",
    ],
-   mistakes:["Trying to maintain pace (run by EFFORT)","Not shortening stride","Skipping gels at 17 and 21.5","Looking up at Heartbreak (look at the ground 10 ft ahead)","Surging to pass people on hills (you will pay for this)"],
+   mistakes:["Trying to maintain pace (run by EFFORT)","Not shortening stride","Skipping gels at 17 and 21.5","Looking up at Heartbreak (look at the ground 10 ft ahead)","Surging to pass people on hills (stay steady, you'll pass them on the downhill)"],
    pacing:{s3:"7:00-7:20/mi (accept pace loss, hold effort)",s35:"8:15-8:40/mi",bq:"Run effort, not pace. Accept 15-30 sec/mi loss."},
    src:"B.A.A.; V.O2; The Running Channel; Dr. Jack Daniels"},
   {id:"f",r:"Miles 21-25.5",nm:"Downhill into Boston",el:"-220 ft (230→15)",
    grade:"Sustained 1.5-2% downhill for 4.5 miles.",
    body:[
-    "After Heartbreak summit near Boston College, the course drops 220 ft over the next 4.5 miles through Brighton and Brookline into Boston. This should feel like relief. For many, it feels like torture.",
+    "After Heartbreak summit near Boston College, the course drops 220 ft over the next 4.5 miles through Brighton and Brookline into Boston. You've conquered the hills — now let gravity carry you toward the finish.",
     "Your quads have now absorbed: 310 ft of downhill braking (miles 1-4), 100 ft more (miles 15-16), and just climbed 170 ft through Newton. Now you ask them to brake again for 220 ft of descent. Cramping probability peaks here. Eccentric damage is cumulative and non-linear: the third bout of downhill running causes disproportionately more damage than the first.",
     "Mile 23: Coolidge Corner, Brookline. Crowds are dense. Mile 24: you cross into Boston city limits. Mile 25: Kenmore Square. The Citgo sign appears above the buildings. For every Boston runner, this sign means: 1.2 miles to go. It is the most emotionally significant landmark on the course.",
-    "Do NOT overstride on this downhill. Short, quick steps. Let gravity pull you but do not fight it with long braking strides. If you cramp, slow down, take electrolytes if available, and keep moving. Walking Boylston Street is still finishing.",
+    "Keep your stride short and quick on this downhill. Let gravity pull you without fighting it with long braking strides. If you cramp, slow down, take electrolytes if available, and keep moving. Walking Boylston Street is still finishing the Boston Marathon.",
    ],
    mistakes:["Overstriding downhill (more quad damage)","Stopping for cramps instead of slowing","Trying to make up lost time from Newton","Forgetting to drink"],
-   pacing:{s3:"6:45-6:55/mi (gravity assist, recover)",s35:"7:55-8:05/mi",bq:"Whatever you have left. Run to the Citgo sign."},
+   pacing:{s3:"6:45-6:55/mi (gravity assist, recover)",s35:"7:55-8:05/mi",bq:"Let gravity help. Run toward the Citgo sign."},
    src:"B.A.A.; course analysis; anecdotal"},
   {id:"x",r:"Miles 25.5 to Finish",nm:"Right on Hereford, Left on Boylston",el:"Flat",
    grade:"0%. Dead flat. 385 yards of Boylston Street.",
    body:[
-    "The most famous 0.7 miles in marathon running. You make a RIGHT turn onto Hereford Street. Then a LEFT onto Boylston Street. The finish line is 600 meters ahead. Crowds line both sides, 5-10 deep. The noise is deafening.",
-    "Your legs may not cooperate. Cramping is common. Tunnel vision is common. The finish line looks both impossibly close and impossibly far. Run. Walk. Crawl. But do not stop.",
+    "The most famous 0.7 miles in marathon running. You make a RIGHT turn onto Hereford Street. Then a LEFT onto Boylston Street. The finish line is 600 meters ahead. Crowds line both sides, 5-10 deep. The energy is incredible.",
+    "Your legs may be heavy. The finish line looks both impossibly close and impossibly far. Soak in the crowd. Run. Walk. However you get there — you're finishing the Boston Marathon.",
     "Once you cross the line: keep moving. Medical will assess you. Volunteers will wrap you in a heat sheet. Your medal will be placed around your neck. You will collect your gear bag. Find the Family Meeting Area on Stuart Street.",
    ],
    mistakes:["Celebrating before the line","Stopping for photos on Boylston (finish first)","Not knowing where Family Meeting is"],
-   pacing:{s3:"Whatever is left.",s35:"Everything.",bq:"You are finishing the Boston Marathon. Pace is irrelevant."},
+   pacing:{s3:"Whatever is left.",s35:"Everything.",bq:"You are finishing the Boston Marathon. Enjoy every step."},
    src:"B.A.A."},
 ];
 
 const FAIL_MODES = [
   {nm:"I Went Out Too Fast",pct:"~35% of DNFs cite pacing",
    phys:"Excessive early pace burns glycogen at an exponential rate. Running 10 sec/mi faster than threshold increases carbohydrate oxidation by ~15%. At Boston, the downhill start masks this: perceived effort is low while metabolic cost is high. By mile 16, glycogen reserves are critically depleted 4-6 miles earlier than they would be in a flat marathon. The result: catastrophic bonk at Newton.",
-   fix:"Cap mile 1 HR at 75% max. Run 10-15 sec/mi slower than goal pace through mile 4. Trust training. Race starts at mile 16."},
+   fix:"Cap mile 1 HR at 75% max. Run 10-15 sec/mi slower than goal pace through mile 4. Trust your training. The patience you show here pays off at Newton."},
   {nm:"My Quads Died at Newton",pct:"Most common Boston-specific failure",
-   phys:"Eccentric muscle damage from downhill running causes micro-tears in quadriceps muscle fibers. Unlike concentric damage, eccentric damage produces delayed-onset inflammation that worsens over hours. At Boston: 310 ft of downhill in miles 1-4 seeds the damage. 100 ft more at miles 15-16 compounds it. By mile 17, when you ask those damaged quads to climb, they cannot generate sufficient force. Power output drops 15-25%. Pace collapses. This is not a willpower problem. It is a structural muscle damage problem.",
-   fix:"Eccentric training: downhill repeats (6-8% grade, 400-800m, once/week for 8+ weeks). Step-downs, Nordic hamstring curls. Run at least 3 long runs with significant downhill in the first 4 miles during training. You cannot fake quad conditioning."},
+   phys:"Eccentric muscle damage from downhill running causes micro-tears in quadriceps muscle fibers. Unlike concentric damage, eccentric damage produces delayed-onset inflammation that worsens over hours. At Boston: 310 ft of downhill in miles 1-4 seeds the damage. 100 ft more at miles 15-16 compounds it. By mile 17, when you ask those damaged quads to climb, they cannot generate sufficient force. Power output drops 15-25%. Pace collapses. This is a physiological challenge, not a willpower issue — and it's very addressable with the right training.",
+   fix:"Eccentric training: downhill repeats (6-8% grade, 400-800m, once/week for 8+ weeks). Step-downs, Nordic hamstring curls. Run at least 3 long runs with significant downhill in the first 4 miles during training. Quad conditioning is one of the most impactful things you can do for Boston."},
   {nm:"Heartbreak Broke Me",pct:"~20% of Newton walkers stop on Heartbreak specifically",
    phys:"Heartbreak arrives at mile 20-21. Glycogen stores are 60-80% depleted. Quads are structurally damaged. Core temperature is elevated. Blood pH is dropping. Lactate is accumulating in muscles that can no longer clear it efficiently. The 4% grade of Heartbreak requires ~12% more energy per stride than flat running. This combination of depleted fuel, damaged muscles, elevated metabolic stress, and increased energy demand creates a cliff-edge effect where pace collapses suddenly rather than gradually.",
-   fix:"Fuel aggressively: gel at M11.8, M17, M21.5. Shorten stride on hills (180+ cadence). Run Newton by effort, not pace. Walk breaks at hill crests are strategically valid and lose less time than a full collapse at mile 22."},
+   fix:"Fuel aggressively: gel at M11.8, M17, M21.5. Shorten stride on hills (180+ cadence). Run Newton by effort, not pace. Strategic walk breaks at hill crests are a smart tactic used by experienced Boston runners."},
   {nm:"I Cramped at Mile 24",pct:"Cramping peaks miles 22-25 at Boston",
    phys:"Current research (Schwellnus et al.) points to altered neuromuscular control rather than simple dehydration as the primary cramping mechanism. After 3+ hours of running with cumulative eccentric damage, fatigued motor neurons fire erratically, causing involuntary sustained contractions. Dehydration and electrolyte loss are contributing factors but not the root cause. Boston's unique downhill-then-uphill-then-downhill profile creates more neuromuscular fatigue than any flat marathon.",
    fix:"Electrolyte supplementation from mile 2 onward. Adequate training volume (accumulated fatigue resistance). Slow down at first sign of cramping. Stretch and walk for 30-60 seconds. Gentle resumption of running. Do NOT sprint through a cramp."},
   {nm:"I Pushed the Mile 15-16 Downhill",pct:"Recurring community warning",
    phys:"Distinct from the 'went out too fast' failure. This is the runner who paced well through mile 14, then saw the sharp downhill at miles 15-16 (3.2% grade, course low point at 60 ft) and thought: 'I'm behind pace, this is free speed.' It is not free. Each downhill stride loads the quads eccentrically. You already absorbed 310 ft of descent in miles 1-4. This second downhill bout adds to cumulative eccentric damage. Research shows the third bout of eccentric loading causes disproportionately more damage than the first two. Pushing here means your quads arrive at Newton mile 16 with more micro-tears than necessary. The collapse comes at mile 22-24, not immediately. Veterans call this 'paying later.' (LetsRun 2025 thread, community coaching consensus)",
-   fix:"Do not 'earn back pace' on mid-course downhills. Treat miles 15-16 as another section to run by EFFORT, not pace. If you're behind goal pace at mile 14, accept it. Pushing the downhill to make up time is borrowing from Newton at a ruinous interest rate."},
+   fix:"Treat miles 15-16 as another section to run by EFFORT, not pace. If you're behind goal pace at mile 14, stay patient — the runners who hold back here often have the strongest finishes through Newton and beyond."},
 ];
 
 const FUEL_PLANS = [
-  {goal:"Sub-3:00",carb:"60-90 g/hr",timing:"Gel every 20-25 min. Start at mile 4. Personal gel at M4-5. Maurten at M11.8, M17, M21.5. Additional personal gel at M9 and M14.",fluids:"4-6 oz every 15-20 min. Cup strategy: pinch cup, sip while running. Practice this. Do not pour it on yourself at mile 2.",note:"At sub-3 pace you are burning ~1,100 cal/hr. You cannot replace it all. The goal is to slow the depletion curve enough to survive Newton."},
-  {goal:"Sub-3:30",carb:"45-60 g/hr",timing:"Gel every 25-30 min. Personal gel at M5-6. Maurten at M11.8, M17, M21.5. One personal gel at M14.",fluids:"4-6 oz every mile from M2. Alternate water and Gatorade. In heat (above 60F): water at every station.",note:"You have more time but also more time for things to go wrong. Fuel consistently. A missed gel at mile 11.8 will haunt you at mile 20."},
+  {goal:"Sub-3:00",carb:"60-90 g/hr",timing:"Gel every 20-25 min. Start at mile 4. Personal gel at M4-5. Maurten at M11.8, M17, M21.5. Additional personal gel at M9 and M14.",fluids:"4-6 oz every 15-20 min. Cup strategy: pinch cup, sip while running. Practice this. Do not pour it on yourself at mile 2.",note:"At sub-3 pace you are burning ~1,100 cal/hr. You can't replace it all, but consistent fueling slows the depletion curve and keeps you strong through Newton."},
+  {goal:"Sub-3:30",carb:"45-60 g/hr",timing:"Gel every 25-30 min. Personal gel at M5-6. Maurten at M11.8, M17, M21.5. One personal gel at M14.",fluids:"4-6 oz every mile from M2. Alternate water and Gatorade. In heat (above 60F): water at every station.",note:"You have more time on the course, which means consistent fueling is even more important. Stay on your gel schedule — especially the mile 11.8 depot before Newton."},
   {goal:"BQ Attempt",carb:"30-60 g/hr",timing:"Gel every 30 min. Maurten at M11.8, M17, M21.5 minimum. Add personal gels if practiced.",fluids:"Drink at every water station from M2. Small sips. Never chug.",note:"For many BQ runners this is a 3:30-4:00+ effort. You are out there longer. Hydration matters more. Bring salt tabs if you sweat heavily."},
 ];
 
@@ -191,20 +191,20 @@ const LAYERS = [
   {temp:"40-50F",top:"Long sleeve or short sleeve + arm warmers",bot:"Shorts or half-tight",acc:"Light gloves, consider headband",note:"Most common race day range. Arm warmers = critical flexibility."},
   {temp:"50-60F",top:"Singlet or short sleeve",bot:"Shorts",acc:"Optional arm warmers to start, discard",note:"Good running weather. Stay hydrated."},
   {temp:"60-70F",top:"Singlet. Lightest possible.",bot:"Split shorts",acc:"Visor, sunscreen, ice sponges at stations",note:"Performance degrades ~2% per degree above 55F. Adjust goal."},
-  {temp:">70F",top:"Minimal coverage. Lightest fabrics.",bot:"Shortest shorts you own",acc:"Visor, heavy sunscreen, ice at every station",note:"Dangerous. Slow down 30-60 sec/mi. Survival mode. 2012 was 89F and hundreds were hospitalized."},
+  {temp:">70F",top:"Minimal coverage. Lightest fabrics.",bot:"Shortest shorts you own",acc:"Visor, heavy sunscreen, ice at every station",note:"Challenging conditions. Slow down 30-60 sec/mi and prioritize health. 2012 was 89F — adjust goals accordingly."},
 ];
 
 const TRAIN = [
-  {nm:"Downhill Repeats",desc:"Find a 6-8% grade hill, 400-800m long. Run DOWN it at marathon pace. Walk back up. Repeat 6-10 times. This trains eccentric quad loading. Do this once per week for 8-10 weeks pre-race.",why:"You cannot fake downhill conditioning. Flat marathon training will not prepare your quads for Boston."},
+  {nm:"Downhill Repeats",desc:"Find a 6-8% grade hill, 400-800m long. Run DOWN it at marathon pace. Walk back up. Repeat 6-10 times. This trains eccentric quad loading. Do this once per week for 8-10 weeks pre-race.",why:"Downhill conditioning is one of the best investments you can make for Boston. Your quads will thank you at Newton."},
   {nm:"Newton Simulation Long Run",desc:"18-20 mile run. Start with 3-4 miles of downhill. Miles 5-13 rolling or flat. Miles 14-18: find hills. Finish with 2 miles flat. This mimics the Boston profile.",why:"Your body needs to experience the specific fatigue sequence: eccentric damage followed by hill climbing followed by more downhill."},
-  {nm:"Back-to-Back Long Runs",desc:"Saturday: 14-16 miles with hills. Sunday: 10-12 miles easy. The Sunday run teaches you to run on pre-fatigued legs.",why:"Newton arrives at mile 16 on legs that have already done significant eccentric work. Simulate this."},
-  {nm:"Quad Strength Work",desc:"Bulgarian split squats: 3x12 each leg. Step-downs (slow 4-count lowering off a step): 3x15. Nordic hamstring curls: 3x8. Single-leg deadlifts: 3x10. Twice per week.",why:"Stronger quads absorb more eccentric load before damage threshold. This is injury prevention AND performance."},
+  {nm:"Back-to-Back Long Runs",desc:"Saturday: 14-16 miles with hills. Sunday: 10-12 miles easy. The Sunday run teaches you to run on pre-fatigued legs.",why:"Newton arrives at mile 16 on legs that have already done significant eccentric work. Simulating this in training builds confidence and resilience."},
+  {nm:"Quad Strength Work",desc:"Bulgarian split squats: 3x12 each leg. Step-downs (slow 4-count lowering off a step): 3x15. Nordic hamstring curls: 3x8. Single-leg deadlifts: 3x10. Twice per week.",why:"Stronger quads absorb more eccentric load before reaching their limit. This is both injury prevention and a real performance advantage."},
   {nm:"Heat Prep (if warm forecast)",desc:"If forecast is above 60F: do 4-5 runs in extra layers in the final 2-3 weeks. Even 20 min of heat exposure helps plasma volume adaptation.",why:"Boston in April can hit 70F+. Thermal acclimatization takes 10-14 days minimum."},
 ];
 
 const ST=[{t:"6:00 AM",d:"Military March"},{t:"9:06 AM",d:"Men Wheelchair"},{t:"9:09 AM",d:"Women Wheelchair"},{t:"9:30 AM",d:"Handcycles/Duos"},{t:"9:37 AM",d:"Pro Men"},{t:"9:47 AM",d:"Pro Women"},{t:"9:50 AM",d:"Para Athletics"},{t:"10:00 AM",d:"Wave 1"},{t:"10:25 AM",d:"Wave 2"},{t:"10:50 AM",d:"Wave 3"},{t:"11:15 AM",d:"Wave 4"}];
 
-const RTABS=["Course Analysis","Qualification","Logistics","Weather","Training","Failure Modes","Course Map","Fuel Strategy","Support & Feedback","Analytics","Sources"];
+const RTABS=["Course Analysis","Qualification","Logistics","Weather","Training","Race Challenges","Course Map","Fuel Strategy","Support & Feedback","Analytics","Sources"];
 const SPTABS=["Your Plan","Spot Cards","Itineraries","Course Map","Transit","Reunion","Gear & Rules","Community Tips","Support & Feedback","Analytics","Sources"];
 
 /* ═══════════════════════════════════════════════════════════════════
@@ -323,7 +323,7 @@ function PCourseWar({th}){
   return <div>
     <Hd t="COURSE ANALYSIS" th={th}/>
     <Bx hl th={th} ch={<div>
-      <p style={{marginBottom:6}}>26.2 miles. 8 towns. 490 ft start. 10 ft finish. Net drop: 480 ft. Total climb: ~815 ft. This course is not a net-downhill gift. It is a course designed to expose the underprepared.</p>
+      <p style={{marginBottom:6}}>26.2 miles. 8 towns. 490 ft start. 10 ft finish. Net drop: 480 ft. Total climb: ~815 ft. This course rewards those who understand it. The elevation profile is unique among World Majors, and preparation is the key to running it well.</p>
       <p style={{fontSize:11,color:th.t3}}>Elevation: V.O2/Dr. Jack Daniels. Gradients: The Running Channel, Outside Running. Physiology: cited per segment.</p>
     </div>}/>
     <Bx th={th} ch={<Elev sg={mapSeg} onClick={setMapSeg} th={th}/>}/>
@@ -347,7 +347,7 @@ function PCourseWar({th}){
           </div>
           {seg.body.map((p,j)=><p key={j} style={{color:th.t2,fontSize:12.5,lineHeight:1.7,marginBottom:8}}>{p}</p>)}
           <div style={{background:th.rd+"0a",border:"1px solid "+th.rd+"22",borderRadius:6,padding:8,marginBottom:8}}>
-            <div style={{fontSize:10,color:th.rd,fontWeight:700,textTransform:"uppercase",letterSpacing:1,marginBottom:3}}>Common Mistakes</div>
+            <div style={{fontSize:10,color:th.rd,fontWeight:700,textTransform:"uppercase",letterSpacing:1,marginBottom:3}}>Watch Out For</div>
             <Bl items={seg.mistakes} th={th}/>
           </div>
           <div style={{background:th.gr+"0a",border:"1px solid "+th.gr+"22",borderRadius:6,padding:8,marginBottom:6}}>
@@ -384,7 +384,7 @@ function PQualify({th}){return <div>
 
 function PLogistics({th}){return <div>
   <Hd t="RACE DAY LOGISTICS" th={th}/>
-  <Bx hl th={th} ch={<p>Treat every published time window as a hard constraint, not a suggestion. Bake in buffer for at least one surprise delay. First-timers consistently underestimate the friction between zones (bag check → bus loading → bus ride → village → corral). Budget 15-20 min more than you think you need at every transition.</p>}/>
+  <Bx hl th={th} ch={<p>Give yourself generous time buffers throughout the morning. The transitions between zones (bag check → bus loading → bus ride → village → corral) take longer than expected, especially for first-timers. Budgeting 15-20 extra minutes at each step keeps the morning relaxed and stress-free.</p>}/>
 
   <Bx t="Bus to Hopkinton: The Real Timeline" th={th} ch={<div>
     <Bl th={th} items={[
@@ -441,7 +441,7 @@ function PLogistics({th}){return <div>
 function PFuel({th}){return <div>
   <Hd t="FUEL & HYDRATION STRATEGY" th={th}/>
   <Bx hl th={th} ch={<div>
-    <p style={{marginBottom:4}}>Boston changes fueling. The early downhill reduces perceived effort, which reduces perceived need to eat. By the time you feel hungry at Newton, glycogen depletion is already critical. Front-load your fueling. Eat before you are hungry. Drink before you are thirsty.</p>
+    <p style={{marginBottom:4}}>Boston's unique profile means fueling strategy matters even more than usual. The early downhill reduces perceived effort, which can reduce the urge to eat. Front-loading your fueling keeps you strong through Newton. Eat before you're hungry, drink before you're thirsty — your future self will appreciate it.</p>
     <p style={{fontSize:11,color:th.t3}}>Aid stations: Water + Gatorade every mile from M2, both sides, paper cups. (B.A.A.)</p>
   </div>}/>
   <Bx t="Maurten Gel Depots" th={th} ch={<Tb hd={["Mile","Product"]} rows={GL.map(g=>[g.m,g.d])} th={th}/>}/>
@@ -480,14 +480,14 @@ function PWeather({th}){return <div>
   <Bx t="Wind" th={th} ch={<Bl th={th} items={[
     "The course runs generally west to east. Prevailing April winds are SW, producing a partial tailwind for most of the course.",
     "NE winds (headwind) occur in ~30% of race years. 2018: 25 mph NE headwind was race-defining.",
-    "Headwind on Comm Ave (M17-21) turns Newton Hills from hard to brutal. Adjust pace expectations by 15-30 sec/mi in headwind years.",
+    "Headwind on Comm Ave (M17-21) adds an extra challenge to Newton Hills. Adjust pace expectations by 15-30 sec/mi in headwind years.",
     "Crosswinds are worst on open stretches of Route 135 (M3-8). No tall buildings for wind break.",
   ]}/>}/>
 </div>;}
 
 function PTrain({th}){return <div>
   <Hd t="TRAINING FOR BOSTON SPECIFICALLY" th={th}/>
-  <Bx hl th={th} ch={<p>Flat marathon training will get you to the start line. It will not get you to the finish. Boston requires specific adaptations that no other major demands: eccentric quad conditioning, downhill running economy, and the ability to climb hills on pre-fatigued legs.</p>}/>
+  <Bx hl th={th} ch={<p>Boston rewards runners who train specifically for its unique demands. Three key adaptations set Boston apart from other majors: eccentric quad conditioning, downhill running economy, and the ability to climb hills on pre-fatigued legs. The good news: all three are very trainable.</p>}/>
   {TRAIN.map((t,i)=><Bx key={i} t={t.nm} th={th} ch={<div>
     <p style={{marginBottom:6,fontSize:12.5}}>{t.desc}</p>
     <div style={{background:th.ck,borderLeft:"3px solid "+th.accent,padding:"6px 10px",borderRadius:"0 5px 5px 0",fontSize:12}}><strong style={{color:th.accent}}>Why:</strong> {t.why}</div>
@@ -501,8 +501,8 @@ function PTrain({th}){return <div>
 </div>;}
 
 function PFail({th}){return <div>
-  <Hd t="COMMON FAILURE MODES" th={th}/>
-  <Bx hl th={th} ch={<p>Boston has a higher DNF rate than most flat marathons. These are the specific mechanisms that break runners here. Each has a physiological basis and each has a preventable solution.</p>}/>
+  <Hd t="COMMON CHALLENGES & SOLUTIONS" th={th}/>
+  <Bx hl th={th} ch={<p>Boston's unique course profile creates specific challenges that differ from flat marathons. Understanding these — and how to prevent them — is what separates confident finishers from anxious ones. Each challenge below has a clear, proven solution.</p>}/>
   {FAIL_MODES.map((fm,i)=><Bx key={i} th={th} ch={<div>
     <div style={{display:"flex",justifyContent:"space-between",alignItems:"baseline",marginBottom:6}}>
       <div style={{fontSize:14,fontWeight:700,color:th.rd}}>"{fm.nm}"</div>
@@ -609,14 +609,14 @@ function SPlan({th}){
       ]}/>
     </div>}/>
 
-    <Bx t="COMMON FAILURE PATTERNS" th={th} ch={<div>
+    <Bx t="COMMON PLANNING PITFALLS" th={th} ch={<div>
       {[
         {p:"Hopkinton + mid-course + finish",why:"Hopkinton access/exit burns the whole day. Road closures compress timelines. You spend hours getting out instead of repositioning.",fix:"Replace Hopkinton with a rail-accessible early town (Framingham, Natick). Then run a rail/Green Line plan for your second sighting."},
         {p:"Over-ambitious 3-4 sighting plan collapses at transfers",why:"Green Line crowding + transfer time + platform backups. Even detailed community plans explicitly warn 'Cleveland Circle may need to be cut.' (Reddit)",fix:"Design your plan where Stop #2 is the 'main event' and everything else is optional. If you hit #2, you won. Every additional stop is bonus, not expected."},
         {p:"Family can't find runner after finish",why:"Fenced security zones force specific exit flow. B.A.A. warns 'considerable time' from finish to meeting area. Cell service degrades with 500K+ people.",fix:"Pre-commit to Family Meeting Area (Stuart St, last-name letter zone) OR pick a landmark a few blocks away (Boston Common is commonly cited). Decide BEFORE race day."},
       ].map((f,i)=><div key={i} style={{marginBottom:8,paddingBottom:8,borderBottom:i<2?"1px solid "+th.bd:"none"}}>
         <div style={{fontSize:12,fontWeight:700,color:th.rd,marginBottom:2}}>Pattern: "{f.p}"</div>
-        <div style={{fontSize:12,color:th.t2,marginBottom:2}}><strong style={{color:th.tx}}>Why it fails:</strong> {f.why}</div>
+        <div style={{fontSize:12,color:th.t2,marginBottom:2}}><strong style={{color:th.tx}}>Why it's tricky:</strong> {f.why}</div>
         <div style={{fontSize:12,color:th.gr}}><strong>Veteran fix:</strong> {f.fix}</div>
       </div>)}
     </div>}/>
@@ -674,7 +674,7 @@ function SSpots({th}){
     {spots.map((s,i)=><Bx key={i} th={th} ch={<div>
       <div style={{fontSize:14,fontWeight:700,color:th.accent,marginBottom:2}}>{s.nm}</div>
       <div style={{fontSize:11,color:th.t2,marginBottom:8}}>{s.sub}</div>
-      {[["Transit",s.transit,th.bl],["Where to Stand",s.stand,th.gr],["Crowd Behavior",s.crowd,th.or],["Exit Strategy",s.exit,th.accent],["What Goes Wrong",s.fail,th.rd],["Best For",s.best,th.t2]].map(([label,text,c],j)=>
+      {[["Transit",s.transit,th.bl],["Where to Stand",s.stand,th.gr],["Crowd Behavior",s.crowd,th.or],["Exit Strategy",s.exit,th.accent],["Good to Know",s.fail,th.rd],["Best For",s.best,th.t2]].map(([label,text,c],j)=>
         <div key={j} style={{marginBottom:6}}>
           <div style={{fontSize:10,color:c,fontWeight:700,textTransform:"uppercase",letterSpacing:1,marginBottom:2}}>{label}</div>
           <div style={{fontSize:12,color:th.t2,lineHeight:1.6,paddingLeft:8,borderLeft:"2px solid "+c+"33"}}>{text}</div>
@@ -793,7 +793,7 @@ function SReunion({th}){return <div>
   <Hd t="POST-FINISH REUNION PLAN" th={th}/>
 
   <Bx t="Finish Area Reality: You Cannot Stand at the Finish Line" hl th={th} ch={<div>
-    <p style={{marginBottom:6,color:th.rd,fontWeight:600}}>Hard truth: the finish area is fenced and access-controlled. Spectators cannot get close to the actual finish line without special/invited access. Fencing and controlled zones push you back. (Reddit, recurring)</p>
+    <p style={{marginBottom:6,color:th.rd,fontWeight:600}}>Important to know: the finish area is fenced and access-controlled. Getting close to the actual finish line requires special/invited access. Plan your viewing spot with this in mind. (Reddit, recurring)</p>
     <Bl th={th} items={[
       "The closest most spectators can get: Boylston St sidewalks east of Hereford, or the Hereford St corner where runners make their right turn. Both are 6-8 people deep by mid-morning.",
       "If you arrive after ~10:30 AM, curb-side viewing on Boylston is effectively gone.",
@@ -895,7 +895,7 @@ function SCommunity({th}){
       <Tag/><p>For 2:40-class runners, a spectator at mile 17 reported catching the Green Line inbound and 'made it to the finish with 5 mins to spare.' For slower runners, the buffer is even more generous.</p>
     </div>}/>
 
-    <Bx t="Common Mistakes" th={th} ch={<div>
+    <Bx t="Watch Out For" th={th} ch={<div>
       <Tag/><p style={{marginBottom:4}}>Going to the start in Hopkinton if you want to see the finish. There is no Commuter Rail in Hopkinton. Getting out requires a car or shuttle, and you lose 90+ min of transit time.</p>
       <Tag/><p style={{marginBottom:4}}>Attempting BC → finish for a fast runner. Green Line frequency may not be enough. Multiple posters report missing the finish after lingering at Heartbreak.</p>
       <Tag/><p style={{marginBottom:4}}>Not having a firm post-race meeting plan. Cell service degrades near the finish. 'Make sure you know where to meet afterward or just meet at your hotel.' (LetsRun)</p>
@@ -963,7 +963,7 @@ function PAnalytics({th}){
     {pg:"Your Plan",pct:15,icon:"#"},
     {pg:"Itineraries",pct:12,icon:"#"},
     {pg:"Transit",pct:10,icon:"#"},
-    {pg:"Failure Modes",pct:9,icon:"#"},
+    {pg:"Race Challenges",pct:9,icon:"#"},
     {pg:"Weather",pct:8,icon:"#"},
   ];
   // Shuffle slightly each tick
